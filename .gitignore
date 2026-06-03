@@ -9,5 +9,5 @@ photos_backup/
 __pycache__/
 .venv/
 
-# Claude Code local session state (the preview launch.json is kept)
-.claude/settings.local.json
+# Local editor / tool state
+.claude/
