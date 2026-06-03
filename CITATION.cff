@@ -7,8 +7,8 @@ authors:
     given-names: "Jeff"
     email: "jeffobrien@ucsb.edu"
     affiliation: "Material / Image Research Lab (MIRL), University of California, Santa Barbara"
-repository-code: "https://github.com/YOUR-USER/mirl-map"
-url: "https://YOUR-USER.github.io/mirl-map/"
+repository-code: "https://github.com/mirl-ucsb/mirl-map"
+url: "https://mirl-ucsb.github.io/mirl-map/"
 abstract: >-
   A no-build static platform that pairs geolocated photographs with per-photo
   written narratives, presented as an interactive Leaflet map and a sequential
