@@ -1,9 +1,9 @@
 /* ── Accessibility settings ──────────────────────────
-   Persisted in localStorage under key "lifta-a11y".
+   Persisted in localStorage under "<storagePrefix>-a11y".
    Applied as classes on <html> and a font-size on :root.
    ─────────────────────────────────────────────────── */
 
-var A11Y_KEY = 'lifta-a11y';
+var A11Y_KEY = ((typeof CONFIG !== 'undefined' && CONFIG.site && CONFIG.site.storagePrefix) || 'site') + '-a11y';
 
 var FONT_STEPS = [
   { label: 'A',  size: 14, key: 'small'  },

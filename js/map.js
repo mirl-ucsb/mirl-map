@@ -16,31 +16,54 @@ document.addEventListener('keydown',function(e){
 const SC = {extant:'#4CAF50',ruins:'#FF9800',destroyed:'#F44336',occupied:'#2196F3'};
 const SL = {extant:'Still standing',ruins:'Ruins',destroyed:'Destroyed',occupied:'Occupied by others'};
 
-const map = L.map('map',{zoomControl:true}).setView([31.796,35.197],17);
-const gSub=['0','1','2','3'], gAttr='Map data \u00a9 Google';
-const tileLayers={
-  'road-en':  L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}',{subdomains:gSub,attribution:gAttr,maxZoom:21}),
-  'road-ar':  L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}',{subdomains:gSub,attribution:gAttr,maxZoom:21}),
-  'satellite':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'Imagery \u00a9 Esri, Maxar, Earthstar Geographics',maxZoom:19}),
-  'hybrid-en':L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}',{subdomains:gSub,attribution:gAttr,maxZoom:21}),
-  'hybrid-ar':L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&hl=ar&x={x}&y={y}&z={z}',{subdomains:gSub,attribution:gAttr,maxZoom:21}),
-  'topo':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',{attribution:'Map &copy; Esri, HERE, Garmin, FAO, NOAA, USGS',maxZoom:19}),
-  // \u2500\u2500 Historical layers, courtesy of Palestine Open Maps (palopenmaps.org).
-  //    All public domain per palopenmaps.org/en/about.
-  // British Mandate 1:20,000 topo-cadastral survey (1928\u201347).
-  'mandate': L.tileLayer('https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg',{
-    attribution:'Survey of Palestine 1942\u201348 \u00b7 <a href="https://palopenmaps.org/" target="_blank" rel="noopener">Palestine Open Maps</a> \u00b7 public domain',
-    maxNativeZoom:16, maxZoom:21, minZoom:10,
-    bounds:[[31.2173, 34.1367],[33.2944, 35.7471]]
-  }),
-  // RAF aerial photographs of Mandate Palestine (1944\u201348), georeferenced by Shaul Holtzman.
-  'aerial':  L.tileLayer('https://cdn.jsdelivr.net/gh/bothness/pom-tiles@2d154a81c81c2647f74dd4ceee4b1bee66119e79/aerial1940s/{z}/{x}/{y}.png',{
-    attribution:'Royal Air Force, 1944 \u00b7 georef. Shaul Holtzman \u00b7 <a href="https://palopenmaps.org/" target="_blank" rel="noopener">Palestine Open Maps</a>',
-    maxNativeZoom:16, maxZoom:21, minZoom:10
-  })
-};
-tileLayers['satellite'].addTo(map);
-var curBase='satellite', curLang=(typeof siteLang!=='undefined'?siteLang:'en');
+const map = L.map('map',{zoomControl:true, minZoom:(CONFIG.map.minZoom||0)}).setView(CONFIG.map.center, CONFIG.map.zoom);
+
+/* \u2500\u2500 Base + historical tile layers, built from CONFIG \u2500\u2500\u2500\u2500\u2500
+   Each CONFIG.baseLayers / CONFIG.historicalLayers entry becomes one or more
+   L.tileLayer instances in `tileLayers`, keyed by id (or id-<code> when the
+   entry carries langVariants). curLang selects the active variant. */
+var curLang = (typeof siteLang !== 'undefined' ? siteLang : ((CONFIG.languages && CONFIG.languages.default) || 'en'));
+var tileLayers = {};
+var _baseIds = [];          // base-layer ids, in CONFIG order (buttons + compare)
+var _histIds = [];          // historical-layer ids
+var noLangLayers = {};      // ids with no language variant
+
+function _mkTile(spec, url){
+  var opts = { attribution: spec.attribution || '', maxZoom: spec.maxZoom || 21 };
+  if (spec.subdomains)    opts.subdomains    = spec.subdomains;
+  if (spec.maxNativeZoom) opts.maxNativeZoom = spec.maxNativeZoom;
+  if (spec.minZoom)       opts.minZoom       = spec.minZoom;
+  if (spec.bounds)        opts.bounds        = spec.bounds;
+  return L.tileLayer(url, opts);
+}
+function _registerLayers(list, idSink){
+  (list || []).forEach(function(spec){
+    idSink.push(spec.id);
+    if (spec.langVariants){
+      Object.keys(spec.langVariants).forEach(function(code){
+        tileLayers[spec.id + '-' + code] = _mkTile(spec, spec.langVariants[code]);
+      });
+    } else {
+      tileLayers[spec.id] = _mkTile(spec, spec.url);
+      noLangLayers[spec.id] = 1;
+    }
+  });
+}
+_registerLayers(CONFIG.baseLayers, _baseIds);
+_registerLayers(CONFIG.historicalLayers, _histIds);
+
+var curBase = CONFIG.map.defaultBase || _baseIds[0];
+applyLayer();   // add the default base layer (applyLayer is hoisted below)
+
+/* Low-density base layer for the locator inset: prefer topo/osm, else default. */
+function _pickMiniSpec(){
+  var byId = {}; (CONFIG.baseLayers||[]).forEach(function(s){ byId[s.id]=s; });
+  var pref = byId['topo'] || byId['osm'] || byId[CONFIG.map.defaultBase] || CONFIG.baseLayers[0];
+  if (pref && pref.langVariants){
+    pref = (CONFIG.baseLayers||[]).filter(function(s){ return !s.langVariants; })[0] || pref;
+  }
+  return pref;
+}
 
 /* ── Mini-map / locator inset ────────────────────────────
    Bottom-left corner shows the current viewport's position
@@ -54,49 +77,86 @@ var curBase='satellite', curLang=(typeof siteLang!=='undefined'?siteLang:'en');
    read at small size). Toggle button collapses it; the
    plugin handles synchronization with the main map.
    ──────────────────────────────────────────────────────── */
-if (typeof L.Control.MiniMap === 'function') {
-  // A separate tile layer instance is required — Leaflet won't share a layer
-  // between two map instances.
-  var miniMapTiles = L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-    { attribution: '', minZoom: 0, maxZoom: 13 }
-  );
+if (CONFIG.miniMap && CONFIG.miniMap.enabled && typeof L.Control.MiniMap === 'function') {
+  // A separate tile-layer instance is required — Leaflet won't share a layer
+  // between two map instances. Use a low-density base from CONFIG.
+  var _miniSpec = _pickMiniSpec();
+  var miniMapTiles = _mkTile(_miniSpec, _miniSpec.url);
   L.control.minimap(miniMapTiles, {
     position: 'bottomleft',
-    width: 160,
-    height: 120,
-    zoomLevelOffset: -5,    // 5 zoom levels wider than the main map
+    width:  CONFIG.miniMap.width  || 160,
+    height: CONFIG.miniMap.height || 120,
+    zoomLevelOffset: (typeof CONFIG.miniMap.zoomOffset === 'number' ? CONFIG.miniMap.zoomOffset : -5),
     toggleDisplay: true,
     minimized: false,
     aimingRectOptions:    { color: '#5a3e28', weight: 2, opacity: 0.85 },
     shadowRectOptions:    { color: '#5a3e28', weight: 1, opacity: 0.4, fillOpacity: 0.15 }
   }).addTo(map);
 }
-// Layers without a language variant (raster historical / single-tongue tiles)
-var noLangLayers = {satellite:1, topo:1, mandate:1, aerial:1};
+
 function getKey(){ return noLangLayers[curBase] ? curBase : curBase+'-'+curLang; }
 function applyLayer(){
   Object.values(tileLayers).forEach(function(l){ if(map.hasLayer(l)) map.removeLayer(l); });
-  tileLayers[getKey()].addTo(map);
+  var key = getKey();
+  if (tileLayers[key]) tileLayers[key].addTo(map);
 }
+function _allLayerIds(){ return _baseIds.concat(_histIds); }
 function setLayer(b){
   curBase=b; applyLayer();
-  ['btn-road','btn-satellite','btn-hybrid','btn-topo','btn-mandate','btn-aerial'].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.classList.remove('active');
+  _allLayerIds().forEach(function(id){
+    var el=document.getElementById('btn-'+id); if(el) el.classList.remove('active');
   });
-  document.getElementById('btn-'+b).classList.add('active');
+  var act=document.getElementById('btn-'+b); if(act) act.classList.add('active');
 }
-/* The English / العربية buttons switch the whole interface language
-   (see js/i18n.js) and, on layers that have a localized variant
-   (road, hybrid), the basemap labels too. */
+/* The language toggle switches the whole interface language (see js/i18n.js)
+   and, on base layers that carry langVariants, the basemap labels too. */
 function setLang(l){
   curLang=l; applyLayer();
   if (typeof applyLang === 'function') applyLang(l);   // UI text, direction, persistence
-  else {
-    document.getElementById('btn-lang-en').classList.toggle('active',l==='en');
-    document.getElementById('btn-lang-ar').classList.toggle('active',l==='ar');
+}
+
+/* Compare state (used by the compare functions further down). Declared here so
+   the dropdowns built below can read the initial keys. */
+var compareMode = false, sideBySideCtrl = null, preCompareBase = null;
+var compareLeftKey  = (_histIds[0] || _baseIds[1] || _baseIds[0]);
+var compareRightKey = (CONFIG.map.defaultBase || _baseIds[0]);
+
+/* Build the base- and historical-layer buttons (and the compare dropdowns)
+   from CONFIG into the header containers in index.html. */
+function buildLayerControls(){
+  var baseWrap = document.getElementById('base-layer-btns');
+  if (baseWrap){
+    baseWrap.innerHTML = (CONFIG.baseLayers||[]).map(function(s){
+      return '<button class="layer-btn'+(s.id===curBase?' active':'')+'" id="btn-'+s.id+'" onclick="setLayer(\''+s.id+'\')">'+s.label+'</button>';
+    }).join('');
+  }
+  var histWrap = document.getElementById('hist-layer-btns');
+  if (histWrap){
+    var html = (CONFIG.historicalLayers||[]).map(function(s){
+      return '<button class="layer-btn" id="btn-'+s.id+'" onclick="setLayer(\''+s.id+'\')">'+s.label+'</button>';
+    }).join('');
+    if (CONFIG.features.compare){
+      html += '<button class="layer-btn" id="btn-compare" onclick="toggleCompare()" aria-pressed="false" aria-label="Toggle side-by-side comparison" title="Side-by-side comparison: drag the handle to compare two map layers">⇆ <span data-i18n="nav.compare">Compare</span></button>';
+    }
+    histWrap.innerHTML = html;
+  }
+  // Hide the whole historical group (and its divider) when there is nothing in it.
+  var histGroup = document.getElementById('hist-layer-group');
+  if (histGroup && !(CONFIG.historicalLayers||[]).length && !CONFIG.features.compare){
+    histGroup.style.display = 'none';
+    var d = histGroup.previousElementSibling;
+    if (d && d.classList && d.classList.contains('h-div')) d.style.display = 'none';
+  }
+  // Compare dropdown options (only when compare is enabled)
+  if (CONFIG.features.compare){
+    var all  = (CONFIG.baseLayers||[]).concat(CONFIG.historicalLayers||[]);
+    var opts = all.map(function(s){ return '<option value="'+s.id+'">'+s.label+'</option>'; }).join('');
+    var cl=document.getElementById('cmp-left'), cr=document.getElementById('cmp-right');
+    if(cl){ cl.innerHTML=opts; cl.value=compareLeftKey; }
+    if(cr){ cr.innerHTML=opts; cr.value=compareRightKey; }
   }
 }
+buildLayerControls();
 /* When the language changes, re-render an open photo so its narrative
    reloads in the new language (Arabic file if present, else English). */
 window.onLangChange = function(){
@@ -119,14 +179,11 @@ window.onLangChange = function(){
    after of the village's destruction. The two <select>
    dropdowns let the visitor swap either side independently.
    ──────────────────────────────────────────────────────── */
-var compareMode = false;
-var sideBySideCtrl = null;
-var compareLeftKey = 'aerial';
-var compareRightKey = 'satellite';
-var preCompareBase = null;   // single-layer state to restore on exit
-
+/* compareMode / sideBySideCtrl / compareLeftKey / compareRightKey /
+   preCompareBase are declared up in the layer-build section. */
 function _setBaseBtnsDisabled(disabled) {
-  ['btn-road','btn-satellite','btn-hybrid','btn-topo','btn-mandate','btn-aerial','btn-lang-en','btn-lang-ar'].forEach(function(id){
+  var ids = _allLayerIds().map(function(id){ return 'btn-' + id; }).concat(['btn-lang-en','btn-lang-ar']);
+  ids.forEach(function(id){
     var el = document.getElementById(id); if(!el) return;
     el.disabled = disabled;
     el.style.opacity = disabled ? '0.4' : '';
@@ -175,7 +232,7 @@ function exitCompare(){
   }
   Object.values(tileLayers).forEach(function(l){ if(map.hasLayer(l)) map.removeLayer(l); });
   // Restore single-layer mode
-  curBase = preCompareBase || 'satellite';
+  curBase = preCompareBase || CONFIG.map.defaultBase || _baseIds[0];
   applyLayer();
   // UI state
   var panel = document.getElementById('compare-panel');
@@ -200,7 +257,12 @@ function setComparePane(side, key){
   else                  { compareRightKey = key; sideBySideCtrl.setRightLayers(tileLayers[key]); }
 }
 
-var polyLayers = {
+/* Polygon overlays (CONFIG.features.polygons), wired to js/data/geodata.js
+   (vBound/vResid/vOlive/vTerr) and the four Layers-panel rows. Guarded so a
+   missing geodata.js never errors. Repurpose labels/colours for your own zones
+   (see CONTENT-GUIDE.md). Defined here but NOT added by default. */
+var polyLayers = {};
+if (typeof vBound !== 'undefined') polyLayers = {
   boundary:    L.polygon(vBound,  {color:'#c8a050',weight:1.5,dashArray:'7 4',fillColor:'#d4aa60',fillOpacity:.07}).bindTooltip('Village boundary (pre-1948) \u00b7 8,743 dunams',{sticky:true}),
   residential: L.polygon(vResid,  {color:'#a07040',weight:1.5,fillColor:'#c89060',fillOpacity:.22}).bindTooltip('Residential core \u00b7 ~450 homes',{sticky:true}),
   olives:      L.polygon(vOlive,  {color:'#507030',weight:1.5,fillColor:'#6a9040',fillOpacity:.32}).bindTooltip('Olive groves \u00b7 ~1,044 dunams (1945)',{sticky:true}),
@@ -330,7 +392,7 @@ var allViewsheds = L.layerGroup(
 // 1949 until the 1967 war put the West Bank under Israeli occupation.
 // Source: OpenStreetMap relation 12331025 (boundary=historic).
 var greenLineLayer = L.layerGroup(
-  greenLine.map(function (coords) {
+  (typeof greenLine !== 'undefined' ? greenLine : []).map(function (coords) {
     return L.polyline(coords, {
       color: '#2a8a3a',
       weight: 2.4,
@@ -466,21 +528,22 @@ function fmtCoords(lat,lon){ return lat.toFixed(6)+'\u00b0N,\u2009'+lon.toFixed(
    separately via the [ID] tokens and the source library; this
    is for citing the photograph itself as a documentary artifact.
    ──────────────────────────────────────────────────────── */
-var CITE_AUTHOR        = "Jeff O'Brien";
-var CITE_AUTHOR_LASTF  = "O'Brien, Jeff";
-var CITE_AUTHOR_APA    = "O'Brien, J.";
-var CITE_BIBTEX_AUTHOR = "O'Brien, Jeff";
-var CITE_PROJECT       = "Lifta · لِفْتا";
-var CITE_PROJECT_PLAIN = "Lifta";
-var CITE_BASE_URL      = "https://jffobrn.github.io/lifta/";
+var CITE_AUTHOR        = CONFIG.site.author;
+var CITE_AUTHOR_LASTF  = CONFIG.site.authorLastFirst;
+var CITE_AUTHOR_APA    = CONFIG.site.authorAPA;
+var CITE_BIBTEX_AUTHOR = CONFIG.site.author;
+var CITE_PROJECT       = CONFIG.citation.project;
+var CITE_PROJECT_PLAIN = CONFIG.citation.projectPlain;
+var CITE_BASE_URL      = CONFIG.site.baseUrl;
+var CITE_PLACE         = CONFIG.citation.placeLabel || "";
 
 function _photoBase(file)   { return file.replace(/\.[^.]+$/, ''); }
 function _photoUrl(file)    { return CITE_BASE_URL + '?photo=' + _photoBase(file); }
-function _bibtexKey(file)   { return 'lifta_' + _photoBase(file).toLowerCase().replace(/[^a-z0-9]/g, '_'); }
+function _bibtexKey(file)   { return (CONFIG.citation.bibtexPrefix || 'photo') + '_' + _photoBase(file).toLowerCase().replace(/[^a-z0-9]/g, '_'); }
 function _todayISO()        { var d = new Date(); return d.toISOString().slice(0,10); }
 function _formatTakenDate(taken_at, style) {
   // taken_at: "2017:04:23 12:43:45"
-  if (!taken_at) return { full: '23 April 2017', short: 'Apr. 2017', year: '2017', month: 'apr' };
+  if (!taken_at) return { full: 'n.d.', short: 'n.d.', chicago: 'n.d.', year: 'n.d.', month: '' };
   var parts = taken_at.split(' ')[0].split(':');
   var y = parts[0], m = parseInt(parts[1], 10), d = parts[2];
   var months_full  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -504,12 +567,14 @@ function buildCitations(idx) {
   var fileId = _photoBase(p.file);
   var today = _todayISO();
 
-  // Chicago — author-date / notes-bibliography blended for photograph
+  var _place = CITE_PLACE ? (', ' + CITE_PLACE) : '';
+
+  // Chicago — author-date / notes-bibliography blended for a photograph
   var chicago = CITE_AUTHOR + ', "' + caption + ',” photograph, ' + date.chicago +
-                ', Lifta, Palestine, in ' + CITE_PROJECT + ', accessed ' + today + ', ' + url + '.';
+                _place + ', in ' + CITE_PROJECT + ', accessed ' + today + ', ' + url + '.';
 
   // MLA 9th edition
-  var mla = CITE_AUTHOR_LASTF + '. "' + caption + '." Photograph, ' + date.full + ', Lifta, Palestine. ' +
+  var mla = CITE_AUTHOR_LASTF + '. "' + caption + '." Photograph, ' + date.full + _place + '. ' +
             CITE_PROJECT + ', ' + url + '. Accessed ' + today + '.';
 
   // APA 7th
@@ -522,8 +587,8 @@ function buildCitations(idx) {
     '  author       = {' + CITE_BIBTEX_AUTHOR + '},\n' +
     '  title        = {' + captionShort.replace(/&/g, '\\&') + '},\n' +
     '  year         = {' + date.year + '},\n' +
-    '  month        = ' + date.month + ',\n' +
-    '  note         = {Photograph, Lifta, Palestine. File ' + fileId + '.},\n' +
+    (date.month ? '  month        = ' + date.month + ',\n' : '') +
+    '  note         = {Photograph' + _place + '. File ' + fileId + '.},\n' +
     '  howpublished = {\\url{' + url + '}}\n' +
     '}';
 
@@ -539,7 +604,7 @@ function openCiteModal(idx) {
   var p = photoInfo[idx];
   var citations = buildCitations(idx);
   document.getElementById('cite-subtitle').textContent =
-    p.file + '  ·  ' + (p.taken_at ? p.taken_at.split(' ')[0].replace(/:/g, '-') : '2017-04-23');
+    p.file + '  ·  ' + (p.taken_at ? p.taken_at.split(' ')[0].replace(/:/g, '-') : 'n.d.');
   var listEl = document.getElementById('cite-list');
   listEl.innerHTML = '';
   citations.forEach(function (c) {
@@ -653,7 +718,7 @@ function openPhotoDrawer(idx){
   drawerIdx=idx;
   document.getElementById('info-drawer-meta').innerHTML='<strong style="color:#8a7060;font-size:.72rem;">'+p.file+'</strong><br><span style="font-family:monospace;">'+fmtCoords(p.lat,p.lon)+'</span>';
   var img=document.getElementById('info-drawer-img');
-  img.src='photos/web/'+photoInfo[idx].file; img.style.display='block';
+  img.src=CONFIG.images.web+photoInfo[idx].file; img.style.display='block';
   document.getElementById('info-drawer-caption').textContent=p.caption;
   var ctxEl=document.getElementById('info-drawer-context');
   ctxEl.innerHTML='<p style="color:#85724e;font-style:italic;">Loading…</p>';
@@ -685,6 +750,7 @@ function stepDrawer(dir){
    always land somewhere new.
    ────────────────────────────────────────────────────────── */
 function wanderToRandomPhoto(){
+  if(!CONFIG.features.wander) return;
   if(!photoInfo || photoInfo.length===0) return;
   var idx;
   if(photoInfo.length===1){
@@ -735,7 +801,7 @@ function closeDrawer(){
 var curIdx=0;
 function openLightbox(idx){
   curIdx=idx; var p=photoInfo[idx];
-  document.getElementById('lightbox-img').src='photos/'+photoInfo[idx].file;
+  document.getElementById('lightbox-img').src=CONFIG.images.full+photoInfo[idx].file;
   document.getElementById('lightbox-caption-txt').textContent=p.caption;
   document.getElementById('lightbox-meta').textContent=p.file+'  \u00b7  '+fmtCoords(p.lat,p.lon)+'  \u00b7  '+(idx+1)+' of '+photoInfo.length;
   document.getElementById('lightbox').classList.add('open');
@@ -774,7 +840,7 @@ document.addEventListener('click',function(e){
   var pel=e.target.closest('[data-idx]');
   if(pel){ var idx=parseInt(pel.dataset.idx,10); if(pel.classList.contains('popup-btn-info')||pel.classList.contains('popup-img')){ openPhotoDrawer(idx); } else { openLightbox(idx); } return; }
   var lel=e.target.closest('[data-lmid]');
-  if(lel){ var lm=landmarks.find(function(l){ return l.id===lel.dataset.lmid; }); if(lm) openLandmarkDrawer(lm); return; }
+  if(lel && typeof landmarks!=='undefined'){ var lm=landmarks.find(function(l){ return l.id===lel.dataset.lmid; }); if(lm) openLandmarkDrawer(lm); return; }
 });
 
 /* ── Walking trail ────────────────────────────────────────────
@@ -919,7 +985,7 @@ var STATUS_COLORS = {
 };
 
 var placesMarkersArr = [];
-places.forEach(function(p){
+if (typeof places !== 'undefined') places.forEach(function(p){
   var color = STATUS_COLORS[p.status] || '#888888';
   var radius = (p.type === 'City') ? 12 : 9;
   var m = L.circleMarker([p.lat, p.lon], {
@@ -1110,7 +1176,7 @@ document.addEventListener('click', function (e) {
 });
 
 var lmMarkersArr=[];
-landmarks.forEach(function(lm){
+if (typeof landmarks !== 'undefined') landmarks.forEach(function(lm){
   var col=SC[lm.status]||'#888';
   var icon=L.divIcon({className:'',html:'<div class="lm-icon" style="background:'+col+'28;border-color:'+col+';">'+lm.emoji+'</div>',iconSize:[34,34],iconAnchor:[17,17],popupAnchor:[0,-20]});
   var mk=L.marker([lm.lat,lm.lon],{icon:icon,zIndexOffset:1000});
@@ -1134,12 +1200,12 @@ photoInfo.forEach(function(p, idx){
   var ic = L.divIcon({
     className: 'photo-marker',
     html: arrowHTML +
-          '<div class="marker-inner"><img src="photos/thumb/' + p.file + '" loading="lazy"><span class="marker-num">' + (idx+1) + '</span></div>',
+          '<div class="marker-inner"><img src="' + CONFIG.images.thumb + p.file + '" loading="lazy"><span class="marker-num">' + (idx+1) + '</span></div>',
     iconSize: [52,52], iconAnchor: [26,26], popupAnchor: [0,-30]
   });
   var mk = L.marker([p.lat, p.lon], {icon: ic});
   mk.bindPopup(
-    '<img class="popup-img" src="photos/web/' + p.file + '" data-idx="' + idx + '">' +
+    '<img class="popup-img" src="' + CONFIG.images.web + p.file + '" data-idx="' + idx + '">' +
     '<div class="popup-caption">' + p.caption + '</div>' +
     '<div class="popup-coords">' + p.file + ' · ' + fmtCoords(p.lat, p.lon) + '</div>' +
     '<div class="popup-footer">' +
@@ -1157,6 +1223,22 @@ photoInfo.forEach(function(p, idx){
 
 
 map.addLayer(mcg);
+
+/* ── Feature flags ─────────────────────────────────────────
+   Hide any element tagged data-feature="X" whose CONFIG.features.X is false,
+   and the language toggle when there is no second language. This is what makes
+   an "off" module simply not there. Tag a new header button or Layers-panel row
+   with data-feature="…" to gate it the same way. */
+function applyFeatureFlags(){
+  document.querySelectorAll('[data-feature]').forEach(function(el){
+    var f = el.getAttribute('data-feature');
+    if (!CONFIG.features[f]) el.style.display = 'none';
+  });
+  if (!(CONFIG.languages && CONFIG.languages.second)) {
+    document.querySelectorAll('[data-lang-toggle]').forEach(function(el){ el.style.display = 'none'; });
+  }
+}
+applyFeatureFlags();
 
 function toggleFS(){
   if(!document.fullscreenElement){
@@ -1241,6 +1323,7 @@ function toggleSearchPanel() {
 }
 
 function openSearchPanel() {
+  if(!CONFIG.features.search) return;
   searchOpen = true;
   var panel = document.getElementById('search-panel');
   var btn   = document.getElementById('btn-search');
@@ -1295,7 +1378,7 @@ function runSearch() {
   var q = input.value.trim();
 
   if (!q) {
-    status.textContent = 'Type to search across all 100 photos and their narratives.';
+    status.textContent = 'Type to search across the photos and their narratives.';
     resultsEl.innerHTML = '';
     searchActiveResults = [];
     return;
@@ -1343,7 +1426,7 @@ function runSearch() {
     var snippetHTML = h.narrativeMatch ? snippet(h.narrative, q) : '';
     return ''
       + '<div class="sr-item' + (n === 0 ? ' active' : '') + '" data-result-idx="' + h.idx + '" tabindex="0">'
-      +   '<img class="sr-thumb" src="photos/thumb/' + p.file + '" loading="lazy" alt="">'
+      +   '<img class="sr-thumb" src="' + CONFIG.images.thumb + p.file + '" loading="lazy" alt="">'
       +   '<div class="sr-meta">'
       +     '<div class="sr-title">' + titleHTML + '</div>'
       +     '<div class="sr-caption">' + captionHTML + '</div>'

@@ -1,11 +1,12 @@
 var lbIdx = 0;
 
-/* Localized chrome label: Arabic from the dictionary when the interface
-   is Arabic, otherwise the English fallback. */
+/* Localized chrome label: the second language from the dictionary when that
+   language is active, otherwise the default-language fallback passed in. */
 function gT(key, en) {
-  if (typeof siteI18N !== 'undefined' && typeof siteLang !== 'undefined' &&
-      siteLang === 'ar' && siteI18N[key] && siteI18N[key].ar) {
-    return siteI18N[key].ar;
+  var sc = (typeof CONFIG !== 'undefined' && CONFIG.languages && CONFIG.languages.second) ? CONFIG.languages.second.code : null;
+  if (sc && typeof siteI18N !== 'undefined' && typeof siteLang !== 'undefined' &&
+      siteLang === sc && siteI18N[key] && siteI18N[key][sc]) {
+    return siteI18N[key][sc];
   }
   return en;
 }
@@ -15,7 +16,7 @@ function fmtCoords(lat, lon) {
 }
 
 function buildSources(ids) {
-  if (!ids || !ids.length) return '';
+  if (!ids || !ids.length || typeof srcLib === 'undefined') return '';
   var links = ids.map(function(id) {
     var s = srcLib[id];
     if (!s) return '';
@@ -30,7 +31,7 @@ function buildSources(ids) {
 function openLb(idx) {
   lbIdx = idx;
   var p = photoInfo[idx];
-  document.getElementById('lb-img').src = 'photos/' + p.file;
+  document.getElementById('lb-img').src = CONFIG.images.full + p.file;
   document.getElementById('lb-caption').textContent = p.caption;
   document.getElementById('lb').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -45,7 +46,7 @@ function closeLb() {
 function stepLb(dir) {
   lbIdx = (lbIdx + dir + photoInfo.length) % photoInfo.length;
   var p = photoInfo[lbIdx];
-  document.getElementById('lb-img').src = 'photos/' + p.file;
+  document.getElementById('lb-img').src = CONFIG.images.full + p.file;
   document.getElementById('lb-caption').textContent = p.caption;
 }
 
@@ -70,7 +71,7 @@ photoInfo.forEach(function(p, idx) {
 
   entry.innerHTML =
     '<div class="g-photo-wrap" onclick="openLb(' + idx + ')">' +
-      '<img src="photos/web/' + p.file + '" alt="' + p.caption.replace(/"/g, '&quot;') + '" loading="lazy">' +
+      '<img src="' + CONFIG.images.web + p.file + '" alt="' + p.caption.replace(/"/g, '&quot;') + '" loading="lazy">' +
       '<span class="g-photo-num">' + (idx + 1) + ' / ' + photoInfo.length + '</span>' +
     '</div>' +
     '<div class="g-caption">' + p.caption + '</div>' +
@@ -179,16 +180,22 @@ window.onLangChange = function () {
     zoomControl: false, attributionControl: false,
     dragging: false, scrollWheelZoom: false, doubleClickZoom: false,
     boxZoom: false, keyboard: false, touchZoom: false
-  }).setView([31.7965, 35.1965], 16);
+  }).setView(CONFIG.map.center, Math.max(2, (CONFIG.map.zoom || 16) - 1));
 
-  L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}',
-    { subdomains: ['0','1','2','3'], maxZoom: 20 }).addTo(smap);
+  // Base layer from CONFIG (the default base, or the first non-localized base).
+  // Google tiles are deliberately not used; OSM / Esri are the terms-clean defaults.
+  var _sbl  = (CONFIG.baseLayers || []).filter(function(s){ return !s.langVariants; });
+  var _sspec = _sbl.filter(function(s){ return s.id === CONFIG.map.defaultBase; })[0] || _sbl[0] ||
+               { url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', subdomains:['a','b','c'], maxZoom:19 };
+  var _sopts = { maxZoom: _sspec.maxZoom || 19 };
+  if (_sspec.subdomains) _sopts.subdomains = _sspec.subdomains;
+  L.tileLayer(_sspec.url, _sopts).addTo(smap);
 
   var cone = L.polygon([], {
     color: '#c89048', weight: 1, opacity: 0.85,
     fillColor: '#f0c068', fillOpacity: 0.30, interactive: false
   }).addTo(smap);
-  var dot = L.circleMarker([31.7965, 35.1965], {
+  var dot = L.circleMarker(CONFIG.map.center, {
     radius: 5, color: '#fff', weight: 2, fillColor: '#5a3e28', fillOpacity: 1, interactive: false
   }).addTo(smap);
 
