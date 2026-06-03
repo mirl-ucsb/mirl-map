@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lifta, Palestine — Photo Map</title>
+
+<!-- SEO -->
+<meta name="description" content="An interactive map and photo essay documenting Lifta — a depopulated Palestinian village in the Jerusalem hills. 100 photographs paired with the pre-1948 cartography of the village.">
+<meta name="author" content="Jeff O'Brien">
+<meta name="keywords" content="Lifta, Palestine, لفتا, Nakba, depopulated village, Jerusalem, 1948, Palestinian heritage, photo essay">
+<link rel="canonical" href="https://jffobrn.github.io/lifta/">
+
+<!-- Open Graph (Facebook, iMessage, Slack, etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifta · لِفْتا">
+<meta property="og:title" content="Lifta · لِفْتا">
+<meta property="og:description" content="An interactive map and photo essay documenting Lifta — a depopulated Palestinian village in the Jerusalem hills.">
+<meta property="og:url" content="https://jffobrn.github.io/lifta/">
+<meta property="og:image" content="https://jffobrn.github.io/lifta/photos/IMG_1595.JPG">
+<meta property="og:image:alt" content="Ruined stone houses on Lifta's upper slope, with modern Israeli residential towers on the ridgeline above">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ar_PS">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Lifta · لِفْتا">
+<meta name="twitter:description" content="An interactive map and photo essay documenting Lifta — a depopulated Palestinian village in the Jerusalem hills.">
+<meta name="twitter:image" content="https://jffobrn.github.io/lifta/photos/IMG_1595.JPG">
+<meta name="twitter:image:alt" content="Ruined stone houses on Lifta's upper slope, with modern Israeli residential towers on the ridgeline above">
+
+<!-- Favicon (data URL — sage square with a small Arabic letter; no separate file required) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'&gt;&lt;rect width='64' height='64' rx='10' fill='%235a3e28'/&gt;&lt;text x='32' y='44' font-family='Georgia,serif' font-size='38' fill='%23f0e8d0' text-anchor='middle'&gt;ل&lt;/text&gt;&lt;/svg&gt;">
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Amiri:wght@400;700&display=swap"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-minimap@3.6.1/dist/Control.MiniMap.min.css"/>
+<link rel="stylesheet" href="css/style.css?v=i18n"/>
+<link rel="stylesheet" href="css/a11y.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<script src="js/lib/leaflet-side-by-side.js?v=fonts2"></script>
+<script src="https://unpkg.com/leaflet-minimap@3.6.1/dist/Control.MiniMap.min.js"></script>
+<script>
+  /* Skip the intro overlay when arriving via permalink (?photo=…)
+     so shared links go directly to the photo. Done in <head> to
+     avoid any flash of the intro before the map renders. */
+  if (new URLSearchParams(location.search).get('photo')) {
+    document.documentElement.classList.add('intro-skip');
+  }
+  /* Set the saved interface language/direction before paint, so an
+     Arabic visitor never sees a left-to-right flash. */
+  try {
+    if (localStorage.getItem('lifta-lang') === 'ar') {
+      var _d = document.documentElement;
+      _d.setAttribute('lang', 'ar');
+      _d.setAttribute('dir', 'rtl');
+    }
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<div id="intro-screen" role="dialog" aria-label="About this project" aria-modal="true">
+  <div class="intro-card">
+
+    <div class="intro-header">
+      <div class="intro-title-ar">&#x644;&#x650;&#x641;&#x652;&#x62A;&#x627;</div>
+      <h1 class="intro-title-en" data-i18n="intro.title">Lifta, Palestine</h1>
+      <div class="intro-subtitle" data-i18n="intro.subtitle">A photographic and cartographic documentation</div>
+    </div>
+
+    <p class="intro-para" data-i18n="intro.p1">
+      Lifta was one of the largest and wealthiest Palestinian villages in the Jerusalem region.
+      Its 2,958 inhabitants were expelled in January and February 1948, in the opening weeks
+      of the Nakba, the mass dispossession that displaced more than 750,000 Palestinians from
+      their homes. The village has remained uninhabited since. Roughly fifty-five of its 450
+      stone houses still stand on the hillside, alongside the terraced olive groves, the
+      village spring, the unfinished mosque, and the cemeteries. Approximately 40,000 of
+      Lifta&rsquo;s descendants live today across the diaspora and the West Bank.
+    </p>
+    <p class="intro-para" data-i18n="intro.p2">
+      This map pairs 100 photographs of the village, most taken on a single afternoon in April 2017, with two from an earlier visit in May 2016,
+      with the cartography of what Lifta was before 1948: its boundary, residential core,
+      olive groves and agricultural terraces, and the named landmarks. Each photograph is
+      geotagged to its place on the hillside and accompanied by a passage drawing on the
+      historical and ethnographic literature.
+    </p>
+
+    <div class="intro-stats">
+      <div class="intro-stat"><span class="is-lbl" data-i18n="intro.stat.pop">Population (1948)</span><span class="is-val">2,958</span></div>
+      <div class="intro-stat"><span class="is-lbl" data-i18n="intro.stat.land">Village land</span><span class="is-val" data-i18n="intro.val.land">8,743 dunams</span></div>
+      <div class="intro-stat"><span class="is-lbl" data-i18n="intro.stat.homes">Homes pre-1948</span><span class="is-val">~450</span></div>
+      <div class="intro-stat"><span class="is-lbl" data-i18n="intro.stat.standing">Still standing today</span><span class="is-val">55</span></div>
+      <div class="intro-stat"><span class="is-lbl" data-i18n="intro.stat.descendants">Descendants today</span><span class="is-val">~40,000</span></div>
+      <div class="intro-stat"><span class="is-lbl" data-i18n="intro.stat.photos">Photographs in this map</span><span class="is-val">100</span></div>
+    </div>
+
+    <div class="intro-tip" data-i18n-html="intro.tip">
+      Click any photograph on the map for its caption and historical narrative.
+      Use the <strong>Search</strong> button (or press <kbd>/</kbd>) to find words across
+      all 100 narratives, the arrow keys (<kbd>&larr;</kbd> <kbd>&rarr;</kbd>)
+      to step through photos in the drawer, or <strong>Wander</strong>
+      (<kbd>W</kbd>) to jump to a random photograph.
+    </div>
+
+    <div class="intro-actions">
+      <button class="intro-btn intro-btn-primary" onclick="dismissIntro()" autofocus data-i18n="intro.enter">Enter the map &rarr;</button>
+      <a href="gallery.html" class="intro-btn intro-btn-secondary" data-i18n="intro.essay">View as photo essay</a>
+    </div>
+
+    <div class="intro-credit" data-i18n-html="intro.credit">
+      Photographs &copy; 2016, 2026 Jeff O&rsquo;Brien. All rights reserved.
+    </div>
+
+  </div>
+</div>
+
+
+<div id="header">
+  <div class="header-left">
+    <h1>&#x644;&#x650;&#x641;&#x652;&#x62A;&#x627; &nbsp;&middot;&nbsp; Lifta</h1>
+    <span class="sub" data-i18n-html="head.sub">Palestine &nbsp;&middot;&nbsp; 100 photographs</span>
+  </div>
+  <div id="header-controls">
+    <div class="layer-group">
+      <button class="layer-btn" id="btn-road" onclick="setLayer('road')" data-i18n="nav.road">Road</button>
+      <button class="layer-btn active" id="btn-satellite" onclick="setLayer('satellite')" data-i18n="nav.satellite">Satellite</button>
+      <button class="layer-btn" id="btn-hybrid" onclick="setLayer('hybrid')" data-i18n="nav.hybrid">Hybrid</button>
+      <button class="layer-btn" id="btn-topo" onclick="setLayer('topo')" data-i18n="nav.topo">Topo</button>
+    </div>
+    <div class="h-div"></div>
+    <div class="layer-group" aria-label="Historical layers">
+      <button class="layer-btn" id="btn-mandate" onclick="setLayer('mandate')" title="Survey of Palestine 1:20,000 topo-cadastral series, 1942 — every house, terrace, footpath, and spring — via Palestine Open Maps" data-i18n="nav.mandate">1942 Survey</button>
+      <button class="layer-btn" id="btn-aerial"  onclick="setLayer('aerial')"  title="Royal Air Force aerial photography over Palestine, 1944–48 — via Palestine Open Maps" data-i18n="nav.aerial">1944 Aerial</button>
+      <button class="layer-btn" id="btn-compare" onclick="toggleCompare()" title="Side-by-side comparison: drag the handle to compare two map layers" aria-label="Toggle side-by-side comparison" aria-pressed="false">&#x21C6; <span data-i18n="nav.compare">Compare</span></button>
+    </div>
+    <div class="h-div"></div>
+    <div class="layer-group">
+      <button class="layer-btn active" id="btn-lang-en" data-lang-btn="en" onclick="setLang('en')">English</button>
+      <button class="layer-btn" id="btn-lang-ar" data-lang-btn="ar" onclick="setLang('ar')">&#x639;&#x631;&#x628;&#x64A;</button>
+    </div>
+    <div class="h-div"></div>
+    <div class="layer-group">
+      <button class="layer-btn active" id="btn-layers" onclick="toggleLayerPanel()">&#9776; <span data-i18n="nav.layers">Layers</span></button>
+    </div>
+    <div class="h-div"></div>
+<button class="layer-btn" id="btn-search" onclick="toggleSearchPanel()" aria-label="Search photos and narratives" aria-expanded="false" aria-controls="search-panel">&#x1F50D; <span data-i18n="nav.search">Search</span></button>
+    <div class="h-div"></div>
+    <button class="layer-btn" id="btn-wander" onclick="wanderToRandomPhoto()" aria-label="Open a random photo" title="Open a random photograph (or press W)">&#9860; <span data-i18n="nav.wander">Wander</span></button>
+    <div class="h-div"></div>
+    <a href="gallery.html" class="layer-btn" style="text-decoration:none;">&#9707; <span data-i18n="nav.gallery">Gallery</span></a>
+    <div class="h-div"></div>
+    <button class="layer-btn" id="btn-timeline" onclick="toggleTimeline()" aria-label="Timeline of Lifta" aria-expanded="false" aria-controls="timeline-panel" title="A documented chronology of the village and its erasure" data-i18n="nav.timeline">Timeline</button>
+    <div class="h-div"></div>
+    <button class="layer-btn" id="btn-stats" onclick="toggleStats()" aria-label="Lifta in numbers" aria-expanded="false" aria-controls="stats-panel" title="Village statistics from Palestinian and pre-state sources" data-i18n="nav.stats">Statistics</button>
+    <div class="h-div"></div>
+    <button class="layer-btn" id="btn-sources" onclick="toggleSources()" aria-label="Sources and bibliography" aria-expanded="false" aria-controls="sources-panel" title="The sources behind every citation on this site" data-i18n="nav.sources">Sources</button>
+    <div class="h-div"></div>
+    <button id="btn-help" onclick="toggleHelp()" aria-label="How to use this map" aria-expanded="false" aria-controls="help-panel" title="How to use this map">?</button>
+    <div class="h-div"></div>
+    <button id="btn-a11y" onclick="toggleA11y()" aria-label="Accessibility options" aria-expanded="false" aria-controls="a11y-panel">Aa</button>
+    <div class="h-div"></div>
+    <button id="btn-fs" onclick="toggleFS()" aria-label="Toggle fullscreen" title="Toggle fullscreen">&#x26F6;</button>
+  </div>
+</div>
+
+<div id="a11y-panel" role="dialog" aria-label="Accessibility options" aria-modal="false">
+  <h3 data-i18n="a11y.title">Accessibility</h3>
+  <div class="a11y-section">
+    <span class="a11y-label" id="fs-label" data-i18n="a11y.textsize">Text size</span>
+    <div class="fs-btns" role="group" aria-labelledby="fs-label">
+      <button class="fs-btn" id="fs-btn-small"  onclick="setFontSize('small')"  aria-pressed="false">A</button>
+      <button class="fs-btn" id="fs-btn-normal" onclick="setFontSize('normal')" aria-pressed="true">A</button>
+      <button class="fs-btn" id="fs-btn-large"  onclick="setFontSize('large')"  aria-pressed="false">A</button>
+      <button class="fs-btn" id="fs-btn-xlarge" onclick="setFontSize('xlarge')" aria-pressed="false">A</button>
+    </div>
+  </div>
+  <div class="a11y-section">
+    <div class="a11y-toggle-row" onclick="toggleHighContrast()" role="button" tabindex="0"
+         aria-pressed="false" aria-label="Toggle high contrast"
+         onkeydown="if(event.key==='Enter'||event.key===' '){toggleHighContrast();event.preventDefault();}">
+      <span class="a11y-toggle-lbl" data-i18n="a11y.hc">High contrast</span>
+      <div class="a11y-toggle" id="toggle-hc" aria-hidden="true"></div>
+    </div>
+  </div>
+  <div class="a11y-section">
+    <div class="a11y-toggle-row" onclick="toggleReduceMotion()" role="button" tabindex="0"
+         aria-pressed="false" aria-label="Toggle reduce motion"
+         onkeydown="if(event.key==='Enter'||event.key===' '){toggleReduceMotion();event.preventDefault();}">
+      <span class="a11y-toggle-lbl" data-i18n="a11y.rm">Reduce motion</span>
+      <div class="a11y-toggle" id="toggle-rm" aria-hidden="true"></div>
+    </div>
+  </div>
+  <p class="a11y-hint" data-i18n="a11y.hint">Settings are saved and persist across pages.</p>
+</div>
+
+<div id="help-panel" role="dialog" aria-label="How to use this map" aria-modal="false">
+  <div class="help-head">
+    <h3>How to use this map</h3>
+    <button id="help-close" onclick="toggleHelp()" aria-label="Close help">&#x2715;</button>
+  </div>
+
+  <div class="help-section">
+    <h4>Map navigation</h4>
+    <ul>
+      <li>Drag to pan; scroll or pinch to zoom.</li>
+      <li>Click any orange dot to open that photograph in the side drawer.</li>
+      <li>Hover any marker for a brief tooltip.</li>
+      <li>Click a teal dot to read a Lifta voice (refugee, descendant, or witness).</li>
+    </ul>
+  </div>
+
+  <div class="help-section">
+    <h4>Top bar</h4>
+    <ul>
+      <li><b>Map style</b> (Road / Satellite / Hybrid / Topo / 1942 Survey / 1944 Aerial): switch the underlying base map.</li>
+      <li><b>&#x21C6; Compare</b>: split-screen comparison &mdash; drag the vertical handle to compare any two layers (e.g. 1944 Aerial vs. modern satellite).</li>
+      <li><b>&#x1F50D; Search</b>: searches captions, filenames, and the historical narratives of all 100 photos.</li>
+      <li><b>&#9860; Wander</b>: open a random photograph (or press <kbd>W</kbd>).</li>
+      <li><b>&#9707; Gallery</b>: browse all 100 photos in a grid view.</li>
+      <li><b>Aa</b>: text size, high-contrast, reduce-motion accessibility options.</li>
+    </ul>
+  </div>
+
+  <div class="help-section">
+    <h4>Layers panel (&#9776;)</h4>
+    <p class="help-p">Click <b>&#9776; Layers</b> to toggle additional overlays:</p>
+    <ul>
+      <li><b>Photo markers</b> (100 photos, mostly 23 April 2017)</li>
+      <li><b>Landmarks</b>: mosque, spring, mukhtar's house, school, etc.</li>
+      <li><b>Pre-1948 polygons</b>: village boundary, residential core, olive groves, agricultural terraces</li>
+      <li><b>Depopulated villages</b> within 8 km, color-coded by post-1948 fate</li>
+      <li><b>1949 Green Line</b></li>
+      <li><b>Lifta Voices</b>: first-person testimonies pinned at relevant locations</li>
+      <li><b>Historical photographs</b>: pre-1948 photographs from public archives (Library of Congress, Wikimedia Commons), each with a "View 2017 photo nearby" button for direct before/after comparison</li>
+      <li><b>Walking trail</b>: animate the photographer's path through the village</li>
+      <li><b>Walking pace</b>: heatmap showing where the photographer lingered</li>
+      <li><b>Sightlines</b>: hover a photo marker to see what its lens was pointed at; turn on the Sightlines layer to draw all 100 at once, so overlapping wedges reveal the same ruin photographed from several standpoints</li>
+    </ul>
+  </div>
+
+  <div class="help-section">
+    <h4>Photo drawer</h4>
+    <ul>
+      <li>Click any photo marker to open the drawer at the right.</li>
+      <li>Use the <b>&lsaquo; Prev</b> / <b>Next &rsaquo;</b> buttons or the arrow keys.</li>
+      <li><b>&#128203; Cite</b>: export a citation in Chicago, MLA, or APA format.</li>
+      <li>The URL updates with <code>?photo=IMG_xxxx</code> &mdash; shareable as a permalink.</li>
+    </ul>
+  </div>
+
+  <div class="help-section">
+    <h4>Keyboard</h4>
+    <ul class="kbd-list">
+      <li><kbd>Esc</kbd> &mdash; close any open panel</li>
+      <li><kbd>W</kbd> &mdash; open a random photo</li>
+      <li><kbd>&larr;</kbd> / <kbd>&rarr;</kbd> &mdash; previous / next photo when drawer is open</li>
+    </ul>
+  </div>
+
+  <div class="help-section">
+    <h4>Sharing &amp; data</h4>
+    <ul>
+      <li><b>Permalinks</b>: every photo has its own URL (<code>?photo=IMG_xxxx</code>) you can share.</li>
+      <li><b>Locator inset</b>: a small mini-map at the bottom-left shows where you are within the wider region.</li>
+    </ul>
+    <button class="help-btn-cta" onclick="downloadKML()" aria-label="Download photos as KML for Google Earth">
+      &#x21E9; Download .kml for Google Earth
+    </button>
+    <p class="help-hint">The KML includes all 100 photos, every landmark, and the surrounding depopulated villages. Open it in Google Earth (Pro, Web, or mobile) to fly the village in 3D. Each placemark links back to this map.</p>
+  </div>
+
+  <p class="help-hint">Press <kbd>Esc</kbd> or click outside this panel to close.</p>
+</div>
+
+<div id="map" role="application" aria-label="Interactive map of Lifta, Palestine"></div>
+
+<div id="compare-panel" role="region" aria-label="Side-by-side layer comparison" aria-hidden="true">
+  <span class="cmp-lbl" data-i18n="cmp.label">Compare</span>
+  <select id="cmp-left" onchange="setComparePane('left', this.value)" aria-label="Left side layer">
+    <option value="aerial">1944 Aerial (RAF)</option>
+    <option value="mandate">1942 Survey (Mandate)</option>
+    <option value="satellite">Satellite (modern)</option>
+    <option value="topo">Topo</option>
+    <option value="road-en">Road</option>
+    <option value="hybrid-en">Hybrid</option>
+  </select>
+  <span class="cmp-vs">&#x2194;</span>
+  <select id="cmp-right" onchange="setComparePane('right', this.value)" aria-label="Right side layer">
+    <option value="aerial">1944 Aerial (RAF)</option>
+    <option value="mandate">1942 Survey (Mandate)</option>
+    <option value="satellite" selected>Satellite (modern)</option>
+    <option value="topo">Topo</option>
+    <option value="road-en">Road</option>
+    <option value="hybrid-en">Hybrid</option>
+  </select>
+  <button class="cmp-exit" onclick="exitCompare()" aria-label="Exit comparison mode" data-i18n="cmp.exit">Exit</button>
+  <span class="cmp-hint" data-i18n-html="cmp.hint">drag the handle &nbsp;&middot;&nbsp; pan/zoom shared</span>
+</div>
+
+<div id="layer-panel" role="region" aria-label="Map layers">
+  <button id="layer-close" onclick="toggleLayerPanel()" aria-label="Close layers panel">&#x2715;</button>
+  <h3 data-i18n="lp.title">Map Layers</h3>
+  <div class="lp-row" onclick="togLayer('photos')">
+    <div class="chk on" id="ck-photos"></div>
+    <span class="lp-lbl" data-i18n="lp.photos">Photo markers (71)</span>
+  </div>
+  <div class="lp-row" onclick="togLayer('landmarks')">
+    <div class="chk on" id="ck-landmarks"></div>
+    <span class="lp-lbl" data-i18n="lp.landmarks">Named landmarks (10)</span>
+  </div>
+  <div class="lp-row" onclick="togLayer('viewsheds')" title="Draw every photo's camera direction and field of view at once; where wedges overlap, the same ruin was photographed from several standpoints">
+    <div class="chk" id="ck-viewsheds"></div>
+    <div class="sw" style="background:#f0c068;border:1px solid #c89048;"></div>
+    <span class="lp-lbl" data-i18n="lp.sightlines">Sightlines (all photos)</span>
+  </div>
+  <div class="lp-sep"></div>
+  <div class="lp-row" onclick="togLayer('boundary')">
+    <div class="chk" id="ck-boundary"></div>
+    <div class="sw" style="background:rgba(200,160,80,.45);border:1px dashed #b89040;"></div>
+    <span class="lp-lbl" data-i18n="lp.boundary">Village boundary (pre-1948)</span>
+  </div>
+  <div class="lp-row" onclick="togLayer('residential')">
+    <div class="chk" id="ck-residential"></div>
+    <div class="sw" style="background:rgba(190,130,70,.4);border:1px solid #906030;"></div>
+    <span class="lp-lbl" data-i18n="lp.residential">Residential core</span>
+  </div>
+  <div class="lp-row" onclick="togLayer('olives')">
+    <div class="chk" id="ck-olives"></div>
+    <div class="sw" style="background:rgba(70,120,50,.45);border:1px solid #406028;"></div>
+    <span class="lp-lbl" data-i18n="lp.olives">Olive groves (~1,044 dunams)</span>
+  </div>
+  <div class="lp-row" onclick="togLayer('terraces')">
+    <div class="chk" id="ck-terraces"></div>
+    <div class="sw" style="background:rgba(150,125,80,.35);border:1px solid #806838;"></div>
+    <span class="lp-lbl" data-i18n="lp.terraces">Agricultural terraces</span>
+  </div>
+  <div class="lp-sep"></div>
+  <div class="lp-row" onclick="togLayer('places')">
+    <div class="chk" id="ck-places"></div>
+    <div class="sw" style="background:#c0392b;border:1px solid #7a2010;"></div>
+    <span class="lp-lbl" data-i18n="lp.places">Depopulated villages (15)</span>
+  </div>
+  <div class="lp-legend" style="margin-left:24px;">
+    <div class="lp-leg-row"><div class="lp-leg-dot" style="background:#c0392b;"></div><span class="lp-leg-txt" data-i18n="lp.leg.depop">Depopulated</span></div>
+    <div class="lp-leg-row"><div class="lp-leg-dot" style="background:#1f1f1f;"></div><span class="lp-leg-txt" data-i18n="lp.leg.builtover">Depopulated &amp; built over</span></div>
+    <div class="lp-leg-row"><div class="lp-leg-dot" style="background:#d68a32;"></div><span class="lp-leg-txt" data-i18n="lp.leg.appropriated">Depopulated &amp; appropriated</span></div>
+  </div>
+  <div class="lp-row" onclick="togLayer('greenline')">
+    <div class="chk" id="ck-greenline"></div>
+    <div class="sw" style="background:transparent;border-top:2px dashed #2a8a3a;border-bottom:none;border-left:none;border-right:none;height:4px;align-self:center;"></div>
+    <span class="lp-lbl" data-i18n="lp.greenline">1949 Green Line</span>
+  </div>
+  <div class="lp-row" onclick="togLayer('testimonies')" title="First-person voices from Lifta — refugees, descendants, and witnesses, pinned at relevant locations">
+    <div class="chk" id="ck-testimonies"></div>
+    <div class="sw" style="background:#2e7080;border:1.5px solid #fff;box-shadow:0 0 0 1px #2e7080;"></div>
+    <span class="lp-lbl" data-i18n="lp.voices">Lifta voices</span>
+  </div>
+  <div class="lp-row" onclick="togLayer('matson')" title="Pre-1948 photographs of Lifta from public archives (Library of Congress's Matson Collection, Wikimedia Commons) — click each marker to see a 'before / after' alongside the nearest 2017 photograph">
+    <div class="chk" id="ck-matson"></div>
+    <div class="sw" style="background:#a87a3a;border:1.5px solid #fff;box-shadow:0 0 0 1px #a87a3a;"></div>
+    <span class="lp-lbl" data-i18n="lp.matson">Historical photographs (1910–47)</span>
+  </div>
+  <div class="lp-row lp-row-with-action">
+    <div class="lp-row-toggle" onclick="togLayer('trail')">
+      <div class="chk" id="ck-trail"></div>
+      <div class="sw" style="background:transparent;border-top:2px dashed #5a3e28;border-bottom:none;border-left:none;border-right:none;height:4px;align-self:center;"></div>
+      <span class="lp-lbl" data-i18n="lp.trail">Walking trail (12:43&ndash;15:32)</span>
+    </div>
+    <button class="lp-action" id="btn-trail-play" onclick="animateTrail()" title="Play the trail as the photographer walked it">&#9654;</button>
+  </div>
+  <div class="lp-row" onclick="togLayer('pace')" title="Where the photographer lingered vs. moved quickly, weighted by time gaps between photos">
+    <div class="chk" id="ck-pace"></div>
+    <div class="sw" style="background:radial-gradient(circle at center,#a03820 0%,#dc8c46 55%,rgba(240,192,104,0) 100%);border:1px solid #85956c;"></div>
+    <span class="lp-lbl" data-i18n="lp.pace">Walking pace</span>
+  </div>
+  <div class="lp-sep"></div>
+  <div class="lp-legend">
+    <div class="lp-leg-row"><div class="lp-leg-dot" style="background:#4CAF50;"></div><span class="lp-leg-txt" data-i18n="lp.leg.standing">Still standing</span></div>
+    <div class="lp-leg-row"><div class="lp-leg-dot" style="background:#FF9800;"></div><span class="lp-leg-txt" data-i18n="lp.leg.ruins">Ruins</span></div>
+    <div class="lp-leg-row"><div class="lp-leg-dot" style="background:#F44336;"></div><span class="lp-leg-txt" data-i18n="lp.leg.destroyed">Destroyed</span></div>
+    <div class="lp-leg-row"><div class="lp-leg-dot" style="background:#2196F3;"></div><span class="lp-leg-txt" data-i18n="lp.leg.occupied">Occupied by others</span></div>
+  </div>
+</div>
+
+<div id="stats-panel" role="region" aria-label="Lifta in numbers">
+  <div class="tl-head">
+    <h3 data-i18n="st.title">Lifta &middot; in numbers</h3>
+    <button id="stats-close" onclick="toggleStats()" aria-label="Close statistics">&#x2715;</button>
+  </div>
+  <div id="stats-list"></div>
+  <p class="tl-foot" data-i18n="st.foot">Population from the Ottoman tax register, the British Mandate censuses, and the 1945 Village Statistics, as compiled by Walid Khalidi and Palestine Remembered; land data from the 1945 Village Statistics. Superscripts link to the source.</p>
+</div>
+
+<div id="timeline-panel" role="region" aria-label="Timeline of Lifta">
+  <div class="tl-head">
+    <h3 data-i18n="tl.title">Lifta &middot; a chronology</h3>
+    <button id="timeline-close" onclick="toggleTimeline()" aria-label="Close timeline">&#x2715;</button>
+  </div>
+  <ol id="timeline-list"></ol>
+  <p class="tl-foot" data-i18n="tl.foot">Each entry is sourced; superscripts link to the reference. Dates and figures follow the cited works.</p>
+</div>
+
+<div id="sources-panel" role="region" aria-label="Sources and bibliography">
+  <div class="tl-head">
+    <h3 data-i18n="src.title">Lifta &middot; the sources</h3>
+    <button id="sources-close" onclick="toggleSources()" aria-label="Close sources">&#x2715;</button>
+  </div>
+  <div id="sources-list"></div>
+  <p class="tl-foot" data-i18n="src.foot">Every figure, date, and quotation on this map and in its narratives is tied to one of these sources, marked in the text by the superscript token shown here. Where a claim could not be verified against a source, it was left out. Full bibliographic detail is in the project README.</p>
+</div>
+
+<div id="about-panel" role="region" aria-label="About Lifta">
+  <button id="about-close" onclick="toggleAbout()" aria-label="Close about panel">&#x2715;</button>
+  <h2>&#x644;&#x650;&#x641;&#x652;&#x62A;&#x627; &nbsp;&middot;&nbsp; Lifta, Palestine</h2>
+  <p>Lifta was one of the largest and wealthiest Palestinian villages in the Jerusalem region. Its 2,958 inhabitants were expelled in January and February 1948, in the opening weeks of the Nakba.</p>
+  <div class="about-stat"><span class="stat-lbl">Population (1948)</span><span class="stat-val">2,958</span></div>
+  <div class="about-stat"><span class="stat-lbl">Village land</span><span class="stat-val">8,743 dunams</span></div>
+  <div class="about-stat"><span class="stat-lbl">Homes (pre-1948)</span><span class="stat-val">~450</span></div>
+  <div class="about-stat"><span class="stat-lbl">Still standing today</span><span class="stat-val">55</span></div>
+  <div class="about-stat"><span class="stat-lbl">Descendants today</span><span class="stat-val">~40,000</span></div>
+  <div class="about-stat"><span class="stat-lbl">Photographs in this map</span><span class="stat-val">100</span></div>
+  <p style="margin-top:10px;padding-top:8px;border-top:1px solid #c0cfa0;color:#3a3020;font-size:.74rem;letter-spacing:.02em;">Photographs &copy; 2016, 2026 Jeff O&rsquo;Brien. All rights reserved.</p>
+  <p style="margin-top:8px;color:#5e5238;font-size:.78rem;line-height:1.55;">Sources: Palestine Remembered &middot; Walid Khalidi, <em>All That Remains</em> (1992) &middot; Nazmi Jubeh, <em>Lifta: Register of a People</em> (IPS, 2021) &middot; Golan, Orr &amp; Ershied, Jerusalem Quarterly 54 (2013)</p>
+</div>
+
+<div id="search-panel" role="dialog" aria-label="Search photos">
+  <div id="search-panel-header">
+    <input type="search" id="search-input" data-i18n-placeholder="search.placeholder" placeholder="Search captions, filenames, narratives…" autocomplete="off" spellcheck="false" aria-label="Search query">
+    <button id="search-close" onclick="closeSearchPanel()" aria-label="Close search">&#x2715;</button>
+  </div>
+  <div id="search-status" data-i18n="search.status">Type to search across all 100 photos and their narratives.</div>
+  <div id="search-results"></div>
+</div>
+
+<div id="status-bar">
+  <div id="photo-count" onclick="toggleAbout()" data-i18n-html="status.count">100 photographs &nbsp;&middot;&nbsp; About &#9432;</div>
+</div>
+
+<div id="info-drawer" role="dialog" aria-label="Photo details" aria-modal="true">
+  <div id="info-drawer-header">
+    <div id="info-drawer-meta"></div>
+    <button id="info-drawer-close" onclick="closeDrawer()" aria-label="Close photo details">&#x2715;</button>
+  </div>
+  <img id="info-drawer-img" src="" alt="" style="display:none;">
+  <div id="info-drawer-body">
+    <div id="info-drawer-caption"></div>
+    <div id="info-drawer-context"></div>
+    <div id="info-drawer-source"></div>
+    <div id="info-drawer-cite"></div>
+  </div>
+  <div id="info-drawer-nav" style="display:none;">
+    <button class="idn-btn" id="idn-prev" data-i18n="drawer.prev" onclick="stepDrawer(-1)" aria-label="Previous photo" title="Previous photo (← arrow)">&#8592; Prev</button>
+    <span id="idn-counter" aria-live="polite"></span>
+    <button class="idn-btn" id="idn-next" data-i18n="drawer.next" onclick="stepDrawer(1)" aria-label="Next photo" title="Next photo (→ arrow)">Next &#8594;</button>
+  </div>
+</div>
+
+<div id="cite-modal" role="dialog" aria-label="Cite this photograph" aria-modal="true">
+  <div id="cite-card">
+    <button id="cite-close" onclick="closeCiteModal()" aria-label="Close citation panel">&#x2715;</button>
+    <h3 id="cite-title" data-i18n="cite.title">Cite this photograph</h3>
+    <div id="cite-subtitle"></div>
+    <div id="cite-list"></div>
+    <div id="cite-toast" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<div id="lightbox" role="dialog" aria-label="Photo lightbox" aria-modal="true">
+  <button id="lightbox-close" aria-label="Close lightbox">&#x2715;</button>
+  <img id="lightbox-img" src="" alt="">
+  <div id="lightbox-caption-txt"></div>
+  <div id="lightbox-meta"></div>
+  <div id="lightbox-nav">
+    <button class="nav-btn" id="prev-btn" aria-label="Previous photo">&#8592;</button>
+    <button class="nav-btn" id="next-btn" aria-label="Next photo">&#8594;</button>
+  </div>
+</div>
+
+
+<script src="js/data/photos.js?v=photos100"></script>
+<script src="js/data/sources.js?v=palquest"></script>
+<script src="js/data/landmarks.js"></script>
+<script src="js/data/places.js"></script>
+<script src="js/data/testimonies.js?v=voices"></script>
+<script src="js/data/matson.js"></script>
+<script src="js/data/greenline.js"></script>
+<script src="js/data/geodata.js"></script>
+<script src="js/a11y.js"></script>
+<script src="js/data/i18n.js?v=i18n"></script>
+<script src="js/i18n.js?v=i18n"></script>
+<script src="js/help.js?v=fonts2"></script>
+<script src="js/kml.js?v=photos100"></script>
+<script src="js/narratives.js?v=i18n"></script>
+<script src="js/data/timeline.js?v=palquest"></script>
+<script src="js/data/stats.js?v=palquest"></script>
+<script src="js/map.js?v=i18n"></script>
+</body>
+</html>
