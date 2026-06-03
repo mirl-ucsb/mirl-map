@@ -145,7 +145,5 @@ MIRL Map is made and maintained by the
 **[Material / Image Research Lab (MIRL)](https://mirl.arthistory.ucsb.edu)** at
 the University of California, Santa Barbara. It grew out of a documentary map of
 the village of Lifta and was generalized so that anyone can tell the story of a
-place. The map itself is drawn using OpenStreetMap and Esri imagery.
-
-For the technically curious, the inner workings are documented in
-[CLAUDE.md](CLAUDE.md) and [PLATFORM-HANDOFF.md](PLATFORM-HANDOFF.md).
+place. The map itself is drawn using OpenStreetMap and Esri imagery, and the code is
+openly commented for anyone who would like to look under the hood.
