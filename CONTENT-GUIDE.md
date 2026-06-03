@@ -11,6 +11,11 @@ browser stops using its cached copy.
 > **Golden rule for the data files:** one entry per `{ ... }` block, separated by
 > commas, inside the `[ ... ]` list. The **last** entry has no trailing comma.
 
+> **Using the `/admin` CMS?** Then photographs are edited in the CMS (or in
+> `content/photos/*.md`), and `js/data/photos.js` + `narratives/*.md` are
+> generated for you — don't hand-edit those. See [`ADMIN-SETUP.md`](ADMIN-SETUP.md).
+> Everything else below (sources, modules, languages) works the same either way.
+
 ---
 
 ## 1. Settings — `js/config.js`

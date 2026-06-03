@@ -60,6 +60,21 @@ For a field-by-field walkthrough aimed at non-coders, see
 
 ---
 
+## Content admin (optional)
+
+Prefer a point-and-click editor to editing files? mirl-map ships an optional
+**`/admin`** page (Decap CMS): contributors log in with GitHub and add
+photographs, captions, and narratives in a real editor — drag-drop a photo, type
+a caption, write the narrative, Publish. Edits commit to the repo and a GitHub
+Action regenerates the data and image tiers automatically. It needs a one-time
+GitHub-OAuth setup; the full steps (and a no-setup local test) are in
+[`ADMIN-SETUP.md`](ADMIN-SETUP.md).
+
+When the CMS is enabled, photographs live in `content/photos/*.md` and
+`js/data/photos.js` becomes a generated file.
+
+---
+
 ## Features (each toggled in `config.js`)
 
 Always on: the interactive map with clustered photo markers, the photo drawer
@@ -89,8 +104,11 @@ js/data/            All content: photos.js, sources.js, the i18n dictionary,
                     and the optional module data files.
 narratives/         One Markdown file per photo (and ar/ for a second language).
 photos/             Full-res images, with generated web/ and thumb/ tiers.
-scripts/            color_correct.py (optional), make_thumbs.py (required).
+scripts/            color_correct.py (optional), make_thumbs.py (required),
+                    build_content.py (CMS compiler).
 add_photo.py        Ingest a photo from its EXIF.
+admin/              Optional Decap CMS editor (see ADMIN-SETUP.md).
+content/photos/     Per-photo source files, present when the CMS is enabled.
 ```
 
 Scripts load at the end of `<body>` in this order: data files, then engine, then
