@@ -1,0 +1,54 @@
+# mirl-map: Project Context for Claude
+
+A reusable, no-build documentary photo-map platform from the Material / Image
+Research Lab (MIRL), UC Santa Barbara. Geolocated photographs paired with
+per-photo narratives, shown as an interactive Leaflet map (`index.html`) and a
+sequential photo essay (`gallery.html`). Generalized from the "Lifta" project.
+Deployed as a static site (GitHub Pages). MIRL forks this per project; it is also
+public for anyone to reuse.
+
+## Orientation
+- `README.md`: what it is, quick start, deploy.
+- `CONTENT-GUIDE.md`: how to fill in each data file (for non-coders).
+- `PLATFORM-HANDOFF.md`: architecture and data contracts (the Lifta → mirl-map
+  lineage).
+- `js/config.js`: every site-level setting (title, map center, tile layers,
+  feature flags, languages). This is the single config surface — the first place
+  to look and the main thing a fork edits.
+
+## Architecture
+- No build step. Vanilla JS + Leaflet from a CDN. Open `index.html` or run
+  `python3 -m http.server`.
+- Engine in `js/*.js`; all content in `js/data/*.js` and `narratives/*.md`.
+- Globals and inline `onclick` handlers, not ES modules, by design. Do not
+  introduce a bundler or framework unless the owner explicitly opts out of the
+  zero-build property.
+- Scripts load in order: `js/config.js` first (in `<head>`), then at the end of
+  `<body>` the data files, then `a11y.js` / `i18n.js`, then the page controller
+  (`map.js` / `gallery.js`). Cache-bust with `?v=` when a file changes.
+- State persists in `localStorage` under `CONFIG.site.storagePrefix`.
+
+## Conventions
+- Data files are formatted one entry per block so diffs stay readable.
+- Accessibility is a feature: the **Aa** control (text size, contrast, motion)
+  must keep working and persist across both pages.
+- Permalinks `?photo=<id>` must resolve on both the map and the gallery.
+- Features are config-gated: an empty data array or a `false` flag must degrade to
+  "not present," never an error. New optional UI should be tagged
+  `data-feature="<flag>"` so `applyFeatureFlags()` hides it when off.
+- Tile layers, base-layer buttons, the compare dropdowns, and the language toggle
+  are generated from `CONFIG` — add a layer or language there, not in the HTML.
+- Prefer the simplest change that fits the existing structure over new
+  abstractions.
+- **Editorial voice is the content owner's choice, not a platform rule.** Do not
+  impose a house style on a fork. (The reference "Lifta" project used a
+  restrained first person and a no-em-dash rule; those were its choices.) A
+  strong default for documentary content: cite every claim, never fabricate a
+  quotation.
+
+## Working here
+- Git repo. Commit and push only when asked.
+- For anything beyond a small edit (a new feature, a refactor, a bulk change),
+  plan first and show the plan before editing.
+- Verify in a browser after changes (the map renders, no console errors, feature
+  gates behave).

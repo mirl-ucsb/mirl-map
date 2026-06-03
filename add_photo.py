@@ -1,28 +1,37 @@
 #!/usr/bin/env python3
 """
-add_photo.py — Add a new photo to the Lifta map.
+add_photo.py — add a photograph to the map.
 
 Usage:
-    python3 add_photo.py photos/IMG_1234.JPG
+    python3 add_photo.py photos/my-photo.jpg
 
 The script will:
-  1. Read GPS coordinates from the photo's EXIF data
-  2. Prompt you for an optional caption and context paragraph
-  3. Append the entry to js/data/photos.js
-  4. Refresh your browser to see the new marker on the map
+  1. Read GPS coordinates (and the capture time) from the photo's EXIF.
+     If there is no GPS (phones often strip it on share; many cameras have
+     none), it asks you to type the latitude and longitude.
+  2. Prompt for an optional caption.
+  3. Append an entry to js/data/photos.js (preserving its header comment).
+  4. Remind you to generate the web/thumb tiers and, optionally, write a
+     narrative.
+
+Then run  python3 scripts/make_thumbs.py  and reload the page.
+
+Requires Pillow:  pip3 install Pillow
 """
 
 import sys, os, re, json
 from pathlib import Path
 
-# --------------------------------------------------------------------------
-PHOTOS_DIR = Path(__file__).parent / 'photos'
-PHOTOS_JS  = Path(__file__).parent / 'js' / 'data' / 'photos.js'
-# --------------------------------------------------------------------------
+# Paths are relative to this file (the repo root). If you change CONFIG.images
+# in js/config.js, change "photos" here to match.
+REPO       = Path(__file__).resolve().parent
+PHOTOS_DIR = REPO / 'photos'
+PHOTOS_JS  = REPO / 'js' / 'data' / 'photos.js'
+EXTS       = ('.jpg', '.jpeg', '.png', '.heic', '.heif')
 
 
 def dms_to_decimal(dms, ref):
-    """Convert degrees/minutes/seconds tuple + N/S/E/W ref to decimal degrees."""
+    """Convert a degrees/minutes/seconds tuple + N/S/E/W ref to decimal degrees."""
     d, m, s = dms
     decimal = d + m / 60 + s / 3600
     if ref in ('S', 'W'):
@@ -30,8 +39,8 @@ def dms_to_decimal(dms, ref):
     return round(decimal, 6)
 
 
-def read_gps(filepath):
-    """Return (lat, lon) from EXIF, or None if not found."""
+def read_exif(filepath):
+    """Return {'coords': (lat, lon) or None, 'taken_at': 'YYYY:MM:DD HH:MM:SS' or None}."""
     try:
         from PIL import Image
         from PIL.ExifTags import TAGS, GPSTAGS
@@ -39,37 +48,49 @@ def read_gps(filepath):
         print("ERROR: Pillow not installed. Run: pip3 install Pillow")
         sys.exit(1)
 
-    img = Image.open(filepath)
-    exif = img._getexif()
-    if not exif:
-        return None
+    out = {'coords': None, 'taken_at': None}
+    try:
+        exif = Image.open(filepath)._getexif() or {}
+    except Exception:
+        return out
 
-    for tag, val in exif.items():
-        if TAGS.get(tag) == 'GPSInfo':
-            gps = {GPSTAGS.get(k, k): v for k, v in val.items()}
-            if 'GPSLatitude' in gps and 'GPSLongitude' in gps:
-                lat = dms_to_decimal(gps['GPSLatitude'],  gps.get('GPSLatitudeRef',  'N'))
-                lon = dms_to_decimal(gps['GPSLongitude'], gps.get('GPSLongitudeRef', 'E'))
-                return lat, lon
-    return None
+    named = {TAGS.get(k, k): v for k, v in exif.items()}
+    if named.get('DateTimeOriginal'):
+        out['taken_at'] = named['DateTimeOriginal']
+
+    gpsinfo = named.get('GPSInfo')
+    if gpsinfo:
+        gps = {GPSTAGS.get(k, k): v for k, v in gpsinfo.items()}
+        if 'GPSLatitude' in gps and 'GPSLongitude' in gps:
+            lat = dms_to_decimal(gps['GPSLatitude'],  gps.get('GPSLatitudeRef',  'N'))
+            lon = dms_to_decimal(gps['GPSLongitude'], gps.get('GPSLongitudeRef', 'E'))
+            out['coords'] = (lat, lon)
+    return out
 
 
 def load_photos_js():
-    """Parse js/data/photos.js and return the Python list."""
+    """Parse js/data/photos.js into a Python list, tolerating a leading comment."""
     content = PHOTOS_JS.read_text()
-    json_str = re.sub(r'^const photoInfo\s*=\s*', '', content.strip().rstrip(';'))
-    return json.loads(json_str)
+    start = content.find('[')
+    end = content.rfind(']')
+    if start < 0 or end < 0:
+        return []
+    return json.loads(content[start:end + 1])
 
 
 def save_photos_js(photo_list):
-    """Write the updated list back to js/data/photos.js."""
+    """Write the list back, preserving any header comment before the assignment."""
     json_str = json.dumps(photo_list, ensure_ascii=False, indent=2)
-    PHOTOS_JS.write_text(f'const photoInfo  = {json_str};\n')
+    header = ''
+    if PHOTOS_JS.exists():
+        m = re.search(r'^(.*?)const\s+photoInfo\s*=', PHOTOS_JS.read_text(), re.S)
+        if m:
+            header = m.group(1)
+    PHOTOS_JS.write_text(f'{header}const photoInfo = {json_str};\n')
 
 
-def prompt(label, default=''):
-    val = input(f'{label}{" [leave blank to skip]" if not default else ""}: ').strip()
-    return val or default
+def prompt(label):
+    return input(f'{label} [Enter to skip]: ').strip()
 
 
 def main():
@@ -77,71 +98,63 @@ def main():
         print(__doc__)
         sys.exit(1)
 
-    arg = sys.argv[1]
-    # Accept bare filename or full path
-    filepath = Path(arg)
+    filepath = Path(sys.argv[1])
     if not filepath.is_absolute():
-        filepath = Path(__file__).parent / filepath
+        filepath = REPO / filepath
     filepath = filepath.resolve()
 
     if not filepath.exists():
-        print(f"ERROR: File not found: {filepath}")
+        print(f"ERROR: file not found: {filepath}")
         sys.exit(1)
-
-    if filepath.suffix.lower() not in ('.jpg', '.jpeg', '.png', '.heic', '.heif'):
-        print(f"ERROR: Unsupported file type: {filepath.suffix}")
+    if filepath.suffix.lower() not in EXTS:
+        print(f"ERROR: unsupported file type: {filepath.suffix}")
         sys.exit(1)
 
     filename = filepath.name
-
-    # Ensure the photo is in the photos/ directory
+    PHOTOS_DIR.mkdir(exist_ok=True)
     dest = PHOTOS_DIR / filename
     if filepath != dest:
         import shutil
         shutil.copy2(filepath, dest)
-        print(f"Copied {filename} → photos/")
+        print(f"Copied {filename} -> photos/")
 
-    # Check for duplicates
     photos = load_photos_js()
     existing = [p['file'] for p in photos]
     if filename in existing:
-        print(f"'{filename}' is already in the map (entry #{existing.index(filename)+1}). Nothing to do.")
+        print(f"'{filename}' is already on the map (entry #{existing.index(filename) + 1}). Nothing to do.")
         sys.exit(0)
 
-    # Read GPS
-    coords = read_gps(dest)
-    if coords:
-        lat, lon = coords
-        print(f"GPS found: {lat:.6f}°N, {lon:.6f}°E")
+    meta = read_exif(dest)
+    if meta['coords']:
+        lat, lon = meta['coords']
+        print(f"GPS found: {lat:.6f}, {lon:.6f}")
     else:
-        print("No GPS data found in EXIF.")
+        print("No GPS in EXIF. Enter coordinates (decimal degrees; "
+              "right-click a spot in Google Maps to copy them).")
         try:
-            lat = float(prompt("Enter latitude  (e.g. 31.798022)"))
-            lon = float(prompt("Enter longitude (e.g. 35.196517)"))
+            lat = float(prompt("Latitude  (e.g. 34.41386)") or "nan")
+            lon = float(prompt("Longitude (e.g. -119.84905)") or "nan")
+            if lat != lat or lon != lon:  # NaN check
+                raise ValueError
         except ValueError:
-            print("ERROR: Invalid coordinates.")
+            print("ERROR: latitude and longitude are required.")
             sys.exit(1)
 
-    # Caption and context
-    print("\nAdd metadata (press Enter to skip any field):")
-    caption = prompt("Caption (short description)")
-    context = prompt("Context (historical paragraph)")
-    source_ids = []  # could extend later
+    caption = prompt("Caption (one or two sentences)")
 
-    new_entry = {
-        "file":       filename,
-        "lat":        lat,
-        "lon":        lon,
-        "caption":    caption,
-        "context":    context,
-        "source_ids": source_ids
-    }
+    entry = {"file": filename, "lat": lat, "lon": lon, "caption": caption, "source_ids": []}
+    if meta['taken_at']:
+        entry["taken_at"] = meta['taken_at']
 
-    photos.append(new_entry)
+    photos.append(entry)
     save_photos_js(photos)
 
-    print(f"\nDone! '{filename}' added as entry #{len(photos)}.")
-    print("Refresh your browser to see the new marker on the map.")
+    base = Path(filename).stem
+    print(f"\nDone. '{filename}' added as entry #{len(photos)}.")
+    print("Next:")
+    print("  1. python3 scripts/make_thumbs.py     (generate web/thumb tiers)")
+    print(f"  2. (optional) write narratives/{base}.md   (its narrative)")
+    print("  3. reload the page.")
 
 
 if __name__ == '__main__':
