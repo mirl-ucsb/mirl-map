@@ -1,96 +1,117 @@
 #!/usr/bin/env python3
 """
-add_photo.py — add a photograph to the map.
+add_photo.py — add a photograph to the map from the command line.
 
 Usage:
     python3 add_photo.py photos/my-photo.jpg
 
-The script will:
-  1. Read GPS coordinates (and the capture time) from the photo's EXIF.
-     If there is no GPS (phones often strip it on share; many cameras have
-     none), it asks you to type the latitude and longitude.
-  2. Prompt for an optional caption.
-  3. Append an entry to js/data/photos.js (preserving its header comment).
-  4. Remind you to generate the web/thumb tiers and, optionally, write a
-     narrative.
+Two modes, chosen automatically:
 
-Then run  python3 scripts/make_thumbs.py  and reload the page.
+  * CMS / content model (this repo): if content/photos/ exists, it writes
+    content/photos/<id>.md (the editable source the /admin CMS also uses, with
+    coordinates / bearing / FOV / capture time filled from the photo's EXIF) and
+    runs scripts/build_content.py to regenerate js/data/photos.js, the narrative
+    file, and the web/thumb tiers.
 
-Requires Pillow:  pip3 install Pillow
+  * Legacy model (a fork that hasn't enabled the CMS): if there is no
+    content/photos/, it appends directly to js/data/photos.js (then you run
+    scripts/make_thumbs.py yourself).
+
+If the photo has no GPS EXIF, it asks you to type the coordinates.
+
+Requires Pillow (and PyYAML for the content model): pip3 install Pillow PyYAML
 """
 
 import sys, os, re, json
 from pathlib import Path
 
-# Paths are relative to this file (the repo root). If you change CONFIG.images
-# in js/config.js, change "photos" here to match.
-REPO       = Path(__file__).resolve().parent
-PHOTOS_DIR = REPO / 'photos'
-PHOTOS_JS  = REPO / 'js' / 'data' / 'photos.js'
-EXTS       = ('.jpg', '.jpeg', '.png', '.heic', '.heif')
+REPO        = Path(__file__).resolve().parent
+PHOTOS_DIR  = REPO / "photos"
+PHOTOS_JS   = REPO / "js" / "data" / "photos.js"
+CONTENT_DIR = REPO / "content" / "photos"
+EXTS        = (".jpg", ".jpeg", ".png", ".heic", ".heif")
 
 
 def dms_to_decimal(dms, ref):
-    """Convert a degrees/minutes/seconds tuple + N/S/E/W ref to decimal degrees."""
-    d, m, s = dms
-    decimal = d + m / 60 + s / 3600
-    if ref in ('S', 'W'):
-        decimal = -decimal
-    return round(decimal, 6)
+    d, m, s = [float(x) for x in dms]
+    v = d + m / 60 + s / 3600
+    return round(-v if ref in ("S", "W") else v, 6)
 
 
-def read_exif(filepath):
-    """Return {'coords': (lat, lon) or None, 'taken_at': 'YYYY:MM:DD HH:MM:SS' or None}."""
+def read_gps(filepath):
+    """Return (lat, lon) from EXIF, or None."""
     try:
         from PIL import Image
         from PIL.ExifTags import TAGS, GPSTAGS
     except ImportError:
         print("ERROR: Pillow not installed. Run: pip3 install Pillow")
         sys.exit(1)
-
-    out = {'coords': None, 'taken_at': None}
     try:
         exif = Image.open(filepath)._getexif() or {}
     except Exception:
-        return out
-
+        return None
     named = {TAGS.get(k, k): v for k, v in exif.items()}
-    if named.get('DateTimeOriginal'):
-        out['taken_at'] = named['DateTimeOriginal']
-
-    gpsinfo = named.get('GPSInfo')
-    if gpsinfo:
-        gps = {GPSTAGS.get(k, k): v for k, v in gpsinfo.items()}
-        if 'GPSLatitude' in gps and 'GPSLongitude' in gps:
-            lat = dms_to_decimal(gps['GPSLatitude'],  gps.get('GPSLatitudeRef',  'N'))
-            lon = dms_to_decimal(gps['GPSLongitude'], gps.get('GPSLongitudeRef', 'E'))
-            out['coords'] = (lat, lon)
-    return out
-
-
-def load_photos_js():
-    """Parse js/data/photos.js into a Python list, tolerating a leading comment."""
-    content = PHOTOS_JS.read_text()
-    start = content.find('[')
-    end = content.rfind(']')
-    if start < 0 or end < 0:
-        return []
-    return json.loads(content[start:end + 1])
-
-
-def save_photos_js(photo_list):
-    """Write the list back, preserving any header comment before the assignment."""
-    json_str = json.dumps(photo_list, ensure_ascii=False, indent=2)
-    header = ''
-    if PHOTOS_JS.exists():
-        m = re.search(r'^(.*?)const\s+photoInfo\s*=', PHOTOS_JS.read_text(), re.S)
-        if m:
-            header = m.group(1)
-    PHOTOS_JS.write_text(f'{header}const photoInfo = {json_str};\n')
+    gps = named.get("GPSInfo")
+    if not gps:
+        return None
+    g = {GPSTAGS.get(k, k): v for k, v in gps.items()}
+    if "GPSLatitude" in g and "GPSLongitude" in g:
+        return (dms_to_decimal(g["GPSLatitude"], g.get("GPSLatitudeRef", "N")),
+                dms_to_decimal(g["GPSLongitude"], g.get("GPSLongitudeRef", "E")))
+    return None
 
 
 def prompt(label):
-    return input(f'{label} [Enter to skip]: ').strip()
+    return input(f"{label} [Enter to skip]: ").strip()
+
+
+def write_content_entry(filename, caption, manual_coords):
+    """CMS/content model: write content/photos/<base>.md (EXIF-filled), then build."""
+    sys.path.insert(0, str(REPO / "scripts"))
+    import build_content
+    import yaml
+
+    def _q(dumper, data):
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="'")
+    yaml.add_representer(str, _q, Dumper=yaml.SafeDumper)
+
+    base = Path(filename).stem
+    exif = build_content.read_exif(str(PHOTOS_DIR / filename))   # lat/lon/bearing/fov/taken_at
+    fm = {"image": "/photos/" + filename, "caption": caption}
+    for k in ("lat", "lon", "bearing", "fov", "taken_at"):
+        if exif.get(k) is not None:
+            fm[k] = exif[k]
+    if "lat" not in fm and manual_coords:
+        fm["lat"], fm["lon"] = manual_coords
+
+    out = CONTENT_DIR / (base + ".md")
+    out.write_text("---\n" + yaml.safe_dump(fm, sort_keys=False, allow_unicode=True) + "---\n\n",
+                   encoding="utf-8")
+    print(f"Wrote content/photos/{base}.md")
+    print("Building (photos.js + narrative + tiers)...")
+    build_content.main()
+    print(f"\nDone. Edit the caption or add a narrative anytime in /admin, or by "
+          f"editing content/photos/{base}.md.")
+
+
+def append_photos_js(filename, caption, coords):
+    """Legacy model: append directly to js/data/photos.js."""
+    text = PHOTOS_JS.read_text()
+    s, e = text.find("["), text.rfind("]")
+    photos = json.loads(text[s:e + 1]) if s >= 0 else []
+    if any(p["file"] == filename for p in photos):
+        print(f"'{filename}' is already on the map. Nothing to do.")
+        return
+    photos.append({"file": filename, "lat": coords[0], "lon": coords[1],
+                   "caption": caption, "source_ids": []})
+    header = ""
+    m = re.search(r"^(.*?)const\s+photoInfo\s*=", text, re.S)
+    if m:
+        header = m.group(1)
+    PHOTOS_JS.write_text(header + "const photoInfo = " +
+                         json.dumps(photos, ensure_ascii=False, indent=2) + ";\n")
+    print(f"Added to js/data/photos.js as entry #{len(photos)}.")
+    print("Next: python3 scripts/make_thumbs.py   (generate web/thumb tiers), then reload.")
 
 
 def main():
@@ -102,7 +123,6 @@ def main():
     if not filepath.is_absolute():
         filepath = REPO / filepath
     filepath = filepath.resolve()
-
     if not filepath.exists():
         print(f"ERROR: file not found: {filepath}")
         sys.exit(1)
@@ -118,44 +138,29 @@ def main():
         shutil.copy2(filepath, dest)
         print(f"Copied {filename} -> photos/")
 
-    photos = load_photos_js()
-    existing = [p['file'] for p in photos]
-    if filename in existing:
-        print(f"'{filename}' is already on the map (entry #{existing.index(filename) + 1}). Nothing to do.")
-        sys.exit(0)
-
-    meta = read_exif(dest)
-    if meta['coords']:
-        lat, lon = meta['coords']
-        print(f"GPS found: {lat:.6f}, {lon:.6f}")
+    coords = read_gps(dest)
+    had_gps = coords is not None
+    if had_gps:
+        print(f"GPS found: {coords[0]:.6f}, {coords[1]:.6f}")
     else:
-        print("No GPS in EXIF. Enter coordinates (decimal degrees; "
-              "right-click a spot in Google Maps to copy them).")
+        print("No GPS in EXIF. Enter coordinates (right-click a spot in Google Maps to copy).")
         try:
             lat = float(prompt("Latitude  (e.g. 34.41386)") or "nan")
             lon = float(prompt("Longitude (e.g. -119.84905)") or "nan")
-            if lat != lat or lon != lon:  # NaN check
+            if lat != lat or lon != lon:
                 raise ValueError
+            coords = (lat, lon)
         except ValueError:
             print("ERROR: latitude and longitude are required.")
             sys.exit(1)
 
     caption = prompt("Caption (one or two sentences)")
 
-    entry = {"file": filename, "lat": lat, "lon": lon, "caption": caption, "source_ids": []}
-    if meta['taken_at']:
-        entry["taken_at"] = meta['taken_at']
-
-    photos.append(entry)
-    save_photos_js(photos)
-
-    base = Path(filename).stem
-    print(f"\nDone. '{filename}' added as entry #{len(photos)}.")
-    print("Next:")
-    print("  1. python3 scripts/make_thumbs.py     (generate web/thumb tiers)")
-    print(f"  2. (optional) write narratives/{base}.md   (its narrative)")
-    print("  3. reload the page.")
+    if CONTENT_DIR.is_dir():
+        write_content_entry(filename, caption, None if had_gps else coords)
+    else:
+        append_photos_js(filename, caption, coords)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
