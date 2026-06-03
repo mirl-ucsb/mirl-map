@@ -263,10 +263,10 @@ function setComparePane(side, key){
    (see CONTENT-GUIDE.md). Defined here but NOT added by default. */
 var polyLayers = {};
 if (typeof vBound !== 'undefined') polyLayers = {
-  boundary:    L.polygon(vBound,  {color:'#c8a050',weight:1.5,dashArray:'7 4',fillColor:'#d4aa60',fillOpacity:.07}).bindTooltip('Village boundary (pre-1948) \u00b7 8,743 dunams',{sticky:true}),
-  residential: L.polygon(vResid,  {color:'#a07040',weight:1.5,fillColor:'#c89060',fillOpacity:.22}).bindTooltip('Residential core \u00b7 ~450 homes',{sticky:true}),
-  olives:      L.polygon(vOlive,  {color:'#507030',weight:1.5,fillColor:'#6a9040',fillOpacity:.32}).bindTooltip('Olive groves \u00b7 ~1,044 dunams (1945)',{sticky:true}),
-  terraces:    L.polygon(vTerr,   {color:'#907840',weight:1,  fillColor:'#b09858',fillOpacity:.18}).bindTooltip('Agricultural terraces \u00b7 ~3,248 dunams cereals',{sticky:true})
+  boundary:    L.polygon(vBound,  {color:'#c8a050',weight:1.5,dashArray:'7 4',fillColor:'#d4aa60',fillOpacity:.07}).bindTooltip('Area 1',{sticky:true}),
+  residential: L.polygon(vResid,  {color:'#a07040',weight:1.5,fillColor:'#c89060',fillOpacity:.22}).bindTooltip('Area 2',{sticky:true}),
+  olives:      L.polygon(vOlive,  {color:'#507030',weight:1.5,fillColor:'#6a9040',fillOpacity:.32}).bindTooltip('Area 3',{sticky:true}),
+  terraces:    L.polygon(vTerr,   {color:'#907840',weight:1,  fillColor:'#b09858',fillOpacity:.18}).bindTooltip('Area 4',{sticky:true})
 };
 // Polygon layers (village boundary, residential core, olive groves, agricultural
 // terraces) are defined here but NOT added to the map by default — visitors opt

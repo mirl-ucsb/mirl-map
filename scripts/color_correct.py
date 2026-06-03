@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """
-Natural / documentary color correction for the Lifta photo archive.
+Natural / documentary colour correction (OPTIONAL).
 
-Philosophy: the originals are mostly well-exposed daylight photographs.
+This is the image-prep pass mirl-map's reference project used. It assumes your
+untouched originals live in photos_backup/ and writes corrected, upright copies
+to photos/. It is entirely optional: if your photos are already web-ready, skip
+straight to make_thumbs.py.
+
+Philosophy: most documentary originals are well-exposed daylight photographs.
 They need a restrained hand, not punchy auto-levels or aggressive white
 balance. This pass:
 
@@ -28,8 +33,10 @@ import glob
 import numpy as np
 from PIL import Image, ImageOps, ImageFilter
 
-REPO = "/Users/jeff/Documents/GitHub/lifta"
+# Repo root is the parent of this scripts/ directory (no absolute paths).
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(REPO, "photos_backup")
+EXTS = ("jpg", "jpeg", "png", "JPG", "JPEG", "PNG")
 
 
 def luminance(arr):
@@ -88,7 +95,12 @@ def stats(img):
 def main():
     out_dir = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "photos")
     os.makedirs(out_dir, exist_ok=True)
-    files = sorted(glob.glob(os.path.join(SRC, "*.JPG")))
+    if not os.path.isdir(SRC):
+        print(f"ERROR: source directory not found: {SRC}\n"
+              f"Put your untouched originals in photos_backup/ (it is gitignored), "
+              f"or skip this step if your photos are already web-ready.")
+        sys.exit(1)
+    files = sorted({p for e in EXTS for p in glob.glob(os.path.join(SRC, "*." + e))})
     print(f"Processing {len(files)} photos  {SRC} -> {out_dir}\n")
 
     for f in files:
