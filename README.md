@@ -1,153 +1,151 @@
-# mirl-map
+# MIRL Map
 
-A reusable, no-build documentary photo-map. It pairs **geolocated photographs**
-with **per-photo written narratives** and presents them two ways: an interactive
-**Leaflet map** and a sequential **photo essay**. Fork it to document a place,
-a trail, a building, an archaeological site, a memory map, or a field survey.
+**Put your photographs on a map, and tell their stories.**
 
-Built and maintained by the [Material / Image Research Lab (MIRL)](https://mirl.arthistory.ucsb.edu)
-at UC Santa Barbara, generalized from the bespoke "Lifta" project. MIRL forks it
-per project; you can too.
+MIRL Map is a free, friendly tool for documenting a place through photographs.
+You pin each photo to the spot where it was taken, give it a caption, and add as
+much or as little writing as you like. The result is two things at once:
 
-- **No toolchain.** Plain HTML, CSS, and vanilla JavaScript with Leaflet from a
-  CDN. No npm, no bundler, no framework.
-- **One config file.** Everything site-specific lives in
-  [`js/config.js`](js/config.js): title, map center, tile layers, feature flags,
-  languages.
-- **Deploys free** on GitHub Pages (or any static host).
-- **Accessible and bilingual-capable** out of the box.
+- an **interactive map** people can explore, clicking any photograph to read
+  about it, and
+- a **photo essay** they can read straight through, from the first image to the
+  last.
 
-The repository ships a small neutral placeholder demo (four generated images
-near UC Santa Barbara) so it runs the moment you open it.
+It was built for people in the **arts, humanities, and cultural heritage**:
+curators, archivists, scholars, artists, librarians, and community historians.
+**You do not need to know how to code to use it.**
+
+The project comes with a small sample map already filled in, so you can see how
+everything works before you add anything of your own.
 
 ---
 
-## See it locally
+## What you might make with it
 
-No build step. Serve the folder and open it:
+A few examples:
 
-```bash
-git clone https://github.com/YOUR-USER/mirl-map.git
-cd mirl-map
-python3 -m http.server 8766
-```
+- A walk through a **neighborhood**, past and present.
+- The rooms and details of a single **building** or monument.
+- An **archaeological site** or excavation, photo by photo.
+- A **memory map** of a place that has changed or disappeared.
+- An **oral-history** project, with voices pinned to the places they describe.
+- A **field survey**, an exhibition, a residency, a pilgrimage route.
 
-Open <http://localhost:8766>. (Opening `index.html` directly mostly works, but a
-local server is needed for the narratives, which load over `fetch`.)
-
----
-
-## Make it yours
-
-1. **Edit [`js/config.js`](js/config.js).** Set the title, the map `center` and
-   `zoom`, pick your base layers, and turn features on or off. Look for the
-   `EDIT ME` markers.
-2. **Add your photographs.** Drop full-resolution images in `photos/`, then:
-   ```bash
-   python3 add_photo.py photos/your-photo.jpg   # reads EXIF GPS, appends to photos.js
-   python3 scripts/make_thumbs.py               # generate the web/thumb tiers (required)
-   ```
-   No GPS in the photo? `add_photo.py` asks you to type the coordinates.
-3. **Write the words.** Edit captions in [`js/data/photos.js`](js/data/photos.js)
-   and add a narrative per photo in `narratives/<filename>.md`.
-4. **Replace the demo prose** (the intro and "about" text marked `EDIT ME` in
-   `index.html` / `gallery.html`).
-5. **Reload.** Bump the `?v=` numbers on the `<script>`/`<link>` tags when a file
-   changes, so browsers fetch the new version.
-
-For a field-by-field walkthrough aimed at non-coders, see
-[`CONTENT-GUIDE.md`](CONTENT-GUIDE.md).
+If it can be photographed and placed on a map, it can become a MIRL Map.
 
 ---
 
-## Content admin (optional)
+## Two ways to see it
 
-Prefer a point-and-click editor to editing files? mirl-map ships an optional
-**`/admin`** page (Decap CMS): contributors log in with GitHub and add
-photographs, captions, and narratives in a real editor — drag-drop a photo, type
-a caption, write the narrative, Publish. Edits commit to the repo and a GitHub
-Action regenerates the data and image tiers automatically. It needs a one-time
-GitHub-OAuth setup; the full steps (and a no-setup local test) are in
-[`ADMIN-SETUP.md`](ADMIN-SETUP.md).
+Every MIRL Map gives you two views of the same photographs and words:
 
-When the CMS is enabled, photographs live in `content/photos/*.md` and
-`js/data/photos.js` becomes a generated file.
+**The map.** Your photographs appear as markers on a map of the area. Visitors
+pan, zoom, and click a photo to open it, along with its caption, your writing,
+and a link they can share. Nearby photos gather into tidy clusters, so even
+hundreds of them stay easy to browse.
 
----
-
-## Features (each toggled in `config.js`)
-
-Always on: the interactive map with clustered photo markers, the photo drawer
-with per-photo narratives and citation export (Chicago / MLA / APA / BibTeX),
-shareable `?photo=` permalinks, and the accessibility panel (text size, high
-contrast, reduced motion).
-
-Optional modules (`CONFIG.features`): full-text **search**, **sightline** view
-cones, the **photo-essay** gallery with a scrollytelling mini-map, **KML** export
-for Google Earth, a documented **timeline**, a **statistics** panel, a **sources**
-citation apparatus, first-person **testimony** pins, archival **before/after**
-photo pins, side-by-side layer **compare**, a **walking-trail** animation, area
-**polygons**, regional **places**, and a second **language** with full RTL
-support. An off module simply is not there: no button, no error.
+**The essay.** The same photographs, read top to bottom like a long-form story,
+with a small map beside the page that follows along as you read. This is the
+slower, guided way through.
 
 ---
 
-## Project structure
+## What it does well
 
-```
-index.html          Map page.
-gallery.html        Photo-essay page + scrollytelling mini-map.
-js/config.js        ← the one file you edit. Every site-level setting.
-js/                 The engine (map.js, gallery.js, narratives.js, i18n.js,
-                    a11y.js, help.js, kml.js, lib/). You rarely touch these.
-js/data/            All content: photos.js, sources.js, the i18n dictionary,
-                    and the optional module data files.
-narratives/         One Markdown file per photo (and ar/ for a second language).
-photos/             Full-res images, with generated web/ and thumb/ tiers.
-scripts/            color_correct.py (optional), make_thumbs.py (required),
-                    build_content.py (CMS compiler).
-add_photo.py        Ingest a photo from its EXIF.
-admin/              Optional Decap CMS editor (see ADMIN-SETUP.md).
-content/photos/     Per-photo source files, present when the CMS is enabled.
-```
+- **Photographs know where they belong.** Most cameras and phones quietly record
+  the location of each photo. MIRL Map reads that on its own, so you usually do
+  not have to place anything by hand. (No location saved in the photo? You can
+  type it in.)
+- **Words, with proper sources.** Write a caption and a narrative for each
+  photograph. Note your sources, and they become tidy footnote-style links, plus
+  a ready-made citation for the photograph itself in Chicago, MLA, APA, or
+  BibTeX style.
+- **Search** across every caption and every narrative at once.
+- **Optional layers** you switch on as your project grows: a documented
+  **timeline**, a **statistics** panel, first-person **oral-history voices**
+  pinned to places, **before-and-after** historical photographs, **historical map
+  overlays** you can slide side by side with today, and outlines of areas or
+  routes.
+- **Open in more than one language**, including right-to-left scripts such as
+  Arabic.
+- **Accessible by design**: larger text, a high-contrast mode, and reduced
+  motion, all remembered between visits.
+- **Free to publish online**, and it stays simple. Visitors need nothing but a
+  web browser.
 
-Scripts load at the end of `<body>` in this order: data files, then engine, then
-the page controller. `js/config.js` loads first, in `<head>`. State persists in
-`localStorage` under `CONFIG.site.storagePrefix`.
-
----
-
-## Deploy to GitHub Pages
-
-1. Push the repository to GitHub.
-2. Set `CONFIG.site.baseUrl` in `js/config.js` to your Pages URL (it is used by
-   citation permalinks and the KML export), and update the `<meta>` tags + the
-   canonical URL in `index.html` / `gallery.html`.
-3. In the repo's **Settings → Pages**, set the source to **GitHub Actions**. The
-   included workflow ([`.github/workflows/static.yml`](.github/workflows/static.yml))
-   publishes the site on every push to `main`.
-
-Any static host works too (Netlify, Cloudflare Pages, S3, a plain web server) —
-there is nothing to build.
+You turn features on only when you want them. A brand-new map is just your
+photographs and your words. Everything else waits quietly until you reach for it.
 
 ---
 
-## A note on tiles
+## Adding your photographs and stories
 
-The defaults are **OpenStreetMap** (streets) and **Esri World Imagery / Topo**
-(satellite and topographic), which are fine to embed. If you need heavier usage
-or vector tiles, plug in a keyed provider (MapTiler, Stadia, Mapbox) in
-`CONFIG.baseLayers`. Always keep each layer's `attribution`.
+There are two ways to add content, whichever suits you better:
+
+**1. A simple web editor (the gentle way, recommended for most people).** MIRL
+Map includes an **editor page** where you log in, drag in a photograph, type its
+caption, write its narrative, and click **Publish**, much like filling in a form.
+No files to touch, no code. This editor needs a one-time setup by someone
+comfortable following the steps in [ADMIN-SETUP.md](ADMIN-SETUP.md); after that,
+anyone you invite can use it.
+
+**2. Editing small text files.** If you would rather, each photograph is just a
+short text file you can edit, and your map's settings live in one place. The
+[Content guide](CONTENT-GUIDE.md) walks through every field in plain language,
+with examples you can copy and paste.
+
+Either way, your changes appear on the live map within about a minute.
 
 ---
 
-## Lineage and reuse
+## Getting it set up
 
-mirl-map is generalized from "Lifta," a documentary map of a depopulated
-Palestinian village. The architecture and data contracts are documented in
-[`PLATFORM-HANDOFF.md`](PLATFORM-HANDOFF.md).
+To be upfront: putting your map *online for the world to see* takes a one-time
+setup that is a little technical. You give the project a free home on **GitHub**
+(a well-known place that hosts projects like this and serves them as a website at
+no cost), and switch that hosting on. It is a handful of steps, written out
+plainly in [ADMIN-SETUP.md](ADMIN-SETUP.md), and it is the sort of thing a
+tech-comfortable colleague, or the MIRL team, can help you do once.
 
-The **engine** (everything in `js/`, `css/`, the scripts, the page structure) is
-yours to reuse and adapt. The **content** you add — your photographs, your
-narratives — is yours; set your own license for it. The shipped placeholder
-images are generated filler with no rights attached.
+After that, the part you do again and again, adding photographs, captions, and
+stories, is the easy, non-technical part.
+
+Would you like to try it on your own computer first, before publishing anything?
+You can. The "Try it locally" steps are in [ADMIN-SETUP.md](ADMIN-SETUP.md).
+
+---
+
+## Your work stays yours
+
+- **You own your content.** Your photographs and your writing are yours. You set
+  whatever permissions and license you wish, and nothing is locked inside someone
+  else's platform.
+- **It is portable and lasting.** A MIRL Map is just photographs, plain text, and
+  a web page: formats that will still open years from now, on any host.
+- **It is free to run.** No subscriptions.
+
+---
+
+## The guides
+
+- **[Content guide](CONTENT-GUIDE.md)** is how to fill in your photographs,
+  captions, narratives, sources, and the optional layers, one field at a time.
+- **[Admin setup](ADMIN-SETUP.md)** covers the web editor and how to publish your
+  map online.
+- **[Settings file](js/config.js)** is the single file that holds your map's
+  title, where it opens, and which features are on. Look for the "EDIT ME" notes.
+
+If you get stuck, the MIRL team is glad to help.
+
+---
+
+## About
+
+MIRL Map is made and maintained by the
+**[Material / Image Research Lab (MIRL)](https://mirl.arthistory.ucsb.edu)** at
+the University of California, Santa Barbara. It grew out of a documentary map of
+the village of Lifta and was generalized so that anyone can tell the story of a
+place. The map itself is drawn using OpenStreetMap and Esri imagery.
+
+For the technically curious, the inner workings are documented in
+[CLAUDE.md](CLAUDE.md) and [PLATFORM-HANDOFF.md](PLATFORM-HANDOFF.md).
