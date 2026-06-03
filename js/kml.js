@@ -14,10 +14,10 @@
    ══════════════════════════════════════════════════════════ */
 
 (function () {
-  // Project URL is hard-coded so KML stays self-describing once exported
-  // (the permalinks remain valid even if the file is sent to a third party).
-  var PROJECT_URL = 'https://jffobrn.github.io/lifta/';
-  var ATTRIBUTION = "Photographs © Jeff O'Brien (2017). Data assembled by Jeff O'Brien (UCSB / MIRL). Public-domain map sources cited per layer.";
+  // Project URL + attribution come from CONFIG so the KML stays self-describing
+  // once exported (the permalinks remain valid even if the file is shared).
+  var PROJECT_URL = (typeof CONFIG !== 'undefined' && CONFIG.site.baseUrl) || '';
+  var ATTRIBUTION = (typeof CONFIG !== 'undefined' && CONFIG.kml && CONFIG.kml.attribution) || '';
 
   function escapeXml(s) {
     return String(s == null ? '' : s)
@@ -39,11 +39,9 @@
     lines.push('<?xml version="1.0" encoding="UTF-8"?>');
     lines.push('<kml xmlns="http://www.opengis.net/kml/2.2">');
     lines.push('<Document>');
-    lines.push('<name>Lifta — 100 Photographs (2016–2017)</name>');
+    lines.push('<name>' + escapeXml(CONFIG.kml.docName || CONFIG.site.title) + '</name>');
     lines.push('<description><![CDATA[' + safeCdata(
-      'Documentary photo-map of Lifta, Palestine — a depopulated village ' +
-      'on the western edge of Jerusalem. 100 photographs, most taken 23 April 2017 (with two from a 2016 visit) ' +
-      'by Jeff O\'Brien (UCSB / MIRL).\n\n' +
+      (CONFIG.site.description || CONFIG.kml.docName || '') + '\n\n' +
       'Project: ' + PROJECT_URL + '\n\n' +
       ATTRIBUTION
     ) + ']]></description>');
@@ -72,9 +70,9 @@
         if (typeof p.lat !== 'number' || typeof p.lon !== 'number') return;
         var basename = p.file.replace(/\.[^.]+$/, '');
         var permalink = PROJECT_URL + '?photo=' + basename;
-        var photoUrl  = PROJECT_URL + 'photos/' + p.file;
+        var photoUrl  = PROJECT_URL + (CONFIG.images.full || 'photos/') + p.file;
         var caption   = p.caption || basename;
-        var taken     = p.taken_at || '2017-04-23';
+        var taken     = p.taken_at || '';
         var bearing   = (typeof p.bearing === 'number') ? p.bearing : null;
 
         // Description: thumbnail + caption + permalink
@@ -83,7 +81,7 @@
         descParts.push('<p><img src="' + photoUrl + '" width="320" alt=""/></p>');
         descParts.push('<p><i>Taken ' + escapeXml(taken) + '</i>' +
           (bearing !== null ? ' &middot; bearing ' + Math.round(bearing) + '°' : '') + '</p>');
-        descParts.push('<p><a href="' + permalink + '">View on the Lifta map</a></p>');
+        descParts.push('<p><a href="' + permalink + '">View on the ' + escapeXml(CONFIG.site.title) + ' map</a></p>');
 
         lines.push('<Placemark>');
         lines.push('<name>' + escapeXml(basename) + '</name>');
@@ -93,7 +91,7 @@
         lines.push('<Point><coordinates>' + p.lon + ',' + p.lat + ',0</coordinates></Point>');
         // Camera bearing as a separate <gx:Camera> would be more sophisticated
         // but most KML viewers ignore <gx:> extensions; bearing is in description.
-        lines.push('<TimeStamp><when>' + escapeXml(taken) + '</when></TimeStamp>');
+        if (taken) lines.push('<TimeStamp><when>' + escapeXml(taken) + '</when></TimeStamp>');
         lines.push('</Placemark>');
       });
       lines.push('</Folder>');
@@ -102,7 +100,7 @@
     // ── Landmarks folder ─────────────────────────────────
     if (typeof landmarks !== 'undefined' && landmarks.length) {
       lines.push('<Folder><name>Landmarks (' + landmarks.length + ')</name>');
-      lines.push('<description>Key sites within Lifta village: spring, mosque, schools, mukhtar\'s house, and others.</description>');
+      lines.push('<description>Named points of interest.</description>');
       landmarks.forEach(function (lm) {
         var nameLine = (lm.name_en || '') + (lm.name_ar ? ' / ' + lm.name_ar : '');
         var descBody = '<p>' + (lm.desc || '').replace(/\n/g, '<br>') + '</p>';
@@ -119,9 +117,9 @@
 
     // ── Depopulated villages folder ──────────────────────
     if (typeof places !== 'undefined' && places.length) {
-      lines.push('<Folder><name>Depopulated villages within 8 km (' + places.length + ')</name>');
+      lines.push('<Folder><name>Places (' + places.length + ')</name>');
       lines.push('<visibility>0</visibility>');  // collapsed by default
-      lines.push('<description>Pre-1948 Palestinian villages within 8 km of Lifta. Status reflects the post-1948 fate of each.</description>');
+      lines.push('<description>Regional context places.</description>');
       places.forEach(function (pl) {
         var nameLine = (pl.name_en || '') + (pl.name_ar ? ' / ' + pl.name_ar : '');
         var endTxt   = pl.end ? ' (' + pl.end + ')' : '';
@@ -149,7 +147,7 @@
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'lifta-photographs.kml';
+      a.download = (CONFIG.kml.filename || 'map.kml');
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();

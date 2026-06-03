@@ -8,3 +8,6 @@ photos_backup/
 *.pyc
 __pycache__/
 .venv/
+
+# Claude Code local session state (the preview launch.json is kept)
+.claude/settings.local.json
