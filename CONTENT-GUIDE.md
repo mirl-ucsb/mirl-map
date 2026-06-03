@@ -1,162 +1,194 @@
-# Content guide
+# Filling in your map: a friendly guide
 
-How to fill in your own content. You do not need to know how to code: every file
-below is a list you edit by copying a block and changing the values. Keep the
-commas and quotation marks exactly as shown.
+This guide explains everything that goes into a MIRL Map: your photographs, their
+captions, the stories you tell about them, your sources, and the optional extras.
+It is written for people who are not programmers.
 
-After any change, reload the page. If nothing changes, bump the small `?v=1`
-number on that file's `<script>` tag in `index.html` (and `gallery.html`) so the
-browser stops using its cached copy.
+There are two ways to add content, and this guide works for both:
 
-> **Golden rule for the data files:** one entry per `{ ... }` block, separated by
-> commas, inside the `[ ... ]` list. The **last** entry has no trailing comma.
+- **The web editor** (the gentle way). You log in to your map's editor page, fill
+  in a simple form for each photograph, and click Publish. If you use the editor,
+  read the parts below about *what* goes into each field, and feel free to skip
+  the file details near the end.
+- **Editing the files directly.** If you would rather work in plain text, the
+  last section, "If you prefer to edit the files," shows you exactly how.
 
-> **Using the `/admin` CMS?** Then photographs are edited in the CMS (or in
-> `content/photos/*.md`), and `js/data/photos.js` + `narratives/*.md` are
-> generated for you — don't hand-edit those. See [`ADMIN-SETUP.md`](ADMIN-SETUP.md).
-> Everything else below (sources, modules, languages) works the same either way.
-
----
-
-## 1. Settings — `js/config.js`
-
-The one file that makes the map yours. Open it and edit the values marked
-`EDIT ME`:
-
-- **`site.title` / `site.subtitle`** — shown in the header and browser tab.
-- **`map.center`** — `[latitude, longitude]`. Right-click a spot in Google Maps
-  to copy its coordinates.
-- **`map.zoom`** — 1 (whole world) to about 18 (a single street).
-- **`baseLayers`** — the map-style buttons. The defaults (OpenStreetMap + Esri)
-  are fine for most projects.
-- **`languages.second`** — leave `null` for one language; see section 8 to add a
-  second.
-- **`features`** — turn modules on (`true`) or off (`false`). Turn one on only
-  once you have added its data.
+Either way, your changes appear on the live map within about a minute. And a
+gentle reminder throughout: take your time, save often, and know that you can
+always change anything later. There is no wrong move you cannot undo.
 
 ---
 
-## 2. Photographs — `js/data/photos.js` (required)
+## The heart of it: photographs, captions, and stories
 
-The heart of the map. Only `file`, `lat`, `lon`, and `caption` are required.
+**Photographs.** Each photo becomes a marker on the map. The lovely part is that
+most cameras and phones save the exact location inside the photo, so MIRL Map can
+usually place it for you, with no coordinates to look up. If a photo has no saved
+location (some phones remove it when you share a picture), you can simply type in
+the latitude and longitude yourself.
 
-```js
-{
-  "file": "my-photo.jpg",          // the filename in photos/
-  "lat": 34.41386,                  // decimal degrees
-  "lon": -119.84905,
-  "caption": "One or two sentences shown under the photo.",
-  "source_ids": ["SAMP"],          // optional: citation tokens (section 3)
-  "bearing": 205,                   // optional: compass degrees the lens faced
-  "fov": 62,                        // optional: horizontal field of view, degrees
-  "taken_at": "2026:05:01 14:10:00" // optional: enables the walking-trail feature
-}
+The map also notices, when the photo recorded them, which way the camera was
+facing and the moment it was taken, and uses them for two small touches: a faint
+cone showing where the lens pointed, and an optional animation that retraces your
+steps in the order you took the pictures.
+
+**Captions.** A caption is the short line shown under the photograph, a sentence
+or two. Think of it as the label beside a picture in an exhibition: what are we
+looking at, and where?
+
+**Narratives.** A narrative is the longer writing for a photograph, as short or
+as long as you like, and entirely optional. This is where the real storytelling
+happens: the history of the place, what changed, who lived there, what a small
+detail means. A photograph with no narrative simply shows its caption.
+
+A few tips for writing:
+
+- You can make words **bold** or *italic*.
+- Leave a blank line between paragraphs.
+- Write in whatever voice suits your project. There is no house style to follow.
+
+---
+
+## Crediting your sources
+
+If your work draws on books, archives, interviews, or websites, MIRL Map makes
+crediting them tidy and automatic.
+
+You keep a short list of your sources, and you give each one a little code of your
+choosing, two to eight capital letters, for example `HARBOR` for a particular
+local history. Then, anywhere in your writing, you mention that code in square
+brackets:
+
+> The pier was rebuilt after the storm of 1925. [HARBOR]
+
+On the map, that becomes a small footnote-style link, and a neat list of sources
+appears under the narrative. You can even cite a page: `[HARBOR p.27]`.
+
+As a bonus, every photograph comes with a ready-made citation of its own, in
+Chicago, MLA, APA, and BibTeX styles, that a visitor can copy with one click.
+
+A good habit, especially for scholarly and heritage work: support each factual
+claim with a source, and never invent a quotation. MIRL Map does not force this
+on you, but it is a sound default.
+
+---
+
+## Optional extras
+
+A new map is just your photographs and your words. When you are ready for more,
+these can be switched on (a colleague can flip them on in the settings file, or
+see the file section below):
+
+- **Timeline.** A dated chronology of your subject, with sources.
+- **In numbers.** A small panel of figures, such as population, dates, or
+  measurements, each one sourced.
+- **Voices.** First-person testimony or oral history, pinned to the places it
+  speaks about. Please quote someone only when you have a real, citable source;
+  otherwise, paraphrase in your own words.
+- **Historical photographs.** Old photos placed on the map, each with a button to
+  show the nearest present-day photograph beside it: a then-and-now.
+- **Historical maps.** An old map laid over today's, with a slider to compare the
+  two side by side.
+- **Areas and routes.** Outlines of a boundary, a zone, or a path, drawn on the
+  map.
+
+Search, the photo-essay view, and a downloadable Google Earth file come included
+as well. You never have to use any of these. They wait until you want them.
+
+---
+
+## Telling your story in another language
+
+MIRL Map can run in two languages, with visitors choosing between them, and it
+handles right-to-left scripts such as Arabic. Switching this on takes a couple of
+small steps (translating the on-screen labels, and providing translated
+narratives), described in the file section below. The language switch appears on
+its own once a second language is set.
+
+---
+
+## If you prefer to edit the files
+
+You do not need this section if you use the web editor. But everything in a MIRL
+Map is plain text, and some people simply like to work that way. Here is how.
+
+**One golden rule:** these files use a few quotation marks, colons, and commas to
+stay organized. When you copy an example, keep that punctuation exactly as you
+see it, and you will be fine.
+
+### Your map's settings: `js/config.js`
+
+This single file holds your map's title, where it opens, and which extras are on.
+Open it and change the lines marked `EDIT ME`:
+
+- the **title** shown at the top,
+- the **center**, the latitude and longitude the map opens on (right-click a spot
+  in Google Maps to copy its coordinates),
+- the **zoom**, where 1 shows the whole world and around 16 shows a few streets,
+- the **features**, each a simple `true` (on) or `false` (off).
+
+### Each photograph
+
+When the web editor is set up, every photograph is a small file in
+`content/photos/`, for example `content/photos/old-pier.md`. It looks like this:
+
+```
+---
+image: /photos/old-pier.jpg
+caption: The old pier at low tide.
+lat: 34.4100
+lon: -119.8500
+---
+The longer narrative goes here, in plain writing.
+You can cite a source like this. [HARBOR]
 ```
 
-The easiest way to add one is `python3 add_photo.py photos/my-photo.jpg`, which
-fills `lat` / `lon` / `taken_at` from the photo's EXIF for you. Then run
-`python3 scripts/make_thumbs.py` to make the small versions the site serves.
+Leave `lat` and `lon` out and they are filled in from the photo automatically.
+After you add or change one of these files, the map rebuilds itself and your
+change appears on the live site within a minute. The file `js/data/photos.js` is
+created for you from these, so there is no need to touch it by hand.
 
-`bearing` + `fov` draw the "sightline" cone showing where the camera pointed.
+(If a map has not turned on the web editor, the photographs live directly in
+`js/data/photos.js` instead, as one list you edit. The idea is the same.)
 
----
+### Your sources: `js/data/sources.js`
 
-## 3. Sources / citations — `js/data/sources.js` (optional)
+A short list pairing each code with its full reference:
 
-A small library of sources. A **token** is 2 to 8 capital letters.
-
-```js
+```
 const srcLib = {
-  "SAMP": { "label": "Author, Title (Publisher, Year)", "url": "https://example.org/" },
-  "ARCH": { "label": "City Archive, Box 12", "url": "" }   // url:"" = no link (e.g. a book)
+  "HARBOR": { "label": "A. Author, A Local History (Publisher, 1990)", "url": "https://..." }
 };
 ```
 
-Then anywhere in a caption, a narrative, a timeline entry, or a stats row, write
-`[SAMP]` or `[SAMP p.27]`. It becomes a small superscript link, and a tidy source
-list appears automatically under each narrative. The **Sources** panel lists
-every entry here.
+Leave the `url` empty (`""`) for a source with no web link, such as a printed
+book.
+
+### A narrative in its own file
+
+If you are not using the per-photograph files above, a narrative can live in a
+file named after its photograph: a photo called `old-pier.jpg` gets a file
+`narratives/old-pier.md`. Plain writing, a blank line between paragraphs,
+`**bold**` and `*italic*`, and `[CODE]` citations just as above.
+
+### The optional extras
+
+Each extra has its own small file in `js/data/`, and every one contains an
+example inside, shown as a comment, that you copy and fill in: `timeline.js`,
+`stats.js`, `testimonies.js` (voices), `matson.js` (historical photographs),
+`geodata.js` (areas), `greenline.js` (routes), and `landmarks.js` (named points).
+Add your entries, set that feature to `true` in the settings file, and reload.
+
+### A second language
+
+In the settings file, set your second language (its code, its name, and whether
+it reads right to left). Then add the translated wording in `js/data/i18n.js`, and
+put any translated narratives in the `narratives/ar/` folder. Anything you have
+not translated gently falls back to your main language.
 
 ---
 
-## 4. Narratives — `narratives/<filename>.md` (optional)
+## If you get stuck
 
-One Markdown file per photo, named after the photo without its extension:
-`photos/my-photo.jpg` → `narratives/my-photo.md`. A photo with no file just shows
-its caption.
-
-- Blank line between paragraphs.
-- `**bold**`, `*italic*`.
-- Citation tokens like `[SAMP]` as above.
-
----
-
-## 5. Landmarks — `js/data/landmarks.js`
-
-Named points of interest. Set `features.landmarks: true` once you add some.
-
-```js
-var landmarks = [
-  {
-    "id": "overlook", "name_en": "The Overlook", "name_ar": "",
-    "lat": 34.4140, "lon": -119.8489,
-    "status": "extant",          // extant | ruins | destroyed | occupied  (sets the colour)
-    "emoji": "📍", "desc": "A short popup description."
-  }
-];
-```
-
----
-
-## 6. Areas, timeline, statistics, places, line, voices, historical photos
-
-Each is an optional module: add data, set its `features.X` flag to `true`.
-
-- **`js/data/geodata.js`** — four area-polygon slots (`vBound`, `vResid`,
-  `vOlive`, `vTerr`), each a closed ring of `[lat, lon]` points. Feature:
-  `polygons`.
-- **`js/data/timeline.js`** — `{ date, text }` entries. Feature: `timeline`.
-- **`js/data/stats.js`** — sections of `[label, value, sourceToken]` rows.
-  Feature: `statistics`.
-- **`js/data/places.js`** — a context layer of nearby places. Feature:
-  `regionalPlaces`.
-- **`js/data/greenline.js`** — one or more polylines (a boundary or route).
-  Feature: `greenLine`.
-- **`js/data/testimonies.js`** — first-person voice pins. **Never add an
-  `excerpt` without a real source**; leave it `null` and paraphrase in `notes`.
-  Feature: `testimonies`.
-- **`js/data/matson.js`** — archival photos pinned with a "view nearest modern
-  photo" button. Feature: `historicalPhotos`.
-
-Each file has a commented example showing its exact shape.
-
----
-
-## 7. Historical map overlays — `js/config.js`
-
-To overlay a georeferenced historical map (and enable side-by-side compare),
-add an entry to `CONFIG.historicalLayers` and set `features.compare: true`. A
-worked example (public-domain tiles) is commented in `config.js`.
-
----
-
-## 8. A second language
-
-1. In `js/config.js`, set, for example:
-   `languages.second = { code: "es", rtl: false, label: "Español" }`
-   (use `rtl: true` for right-to-left scripts like Arabic).
-2. In `js/data/i18n.js`, add a field named with that code to each key:
-   `"nav.search": { en: "Search", es: "Buscar" }`.
-3. Translate narratives into `narratives/ar/<filename>.md` (the folder is named
-   `ar/` as the shipped example; keep that name or update the one path in
-   `js/narratives.js`). A missing translation falls back to the default language.
-
-The language toggle appears automatically once a second language is set.
-
----
-
-## A good default content policy
-
-For documentary work: cite every factual claim, and never invent a quotation. If
-you cannot source something, leave it out. mirl-map does not enforce this — set
-your own editorial voice — but it is a strong default.
+The MIRL team is glad to help. And remember: you can change anything later, so
+nothing here is a one-way door.
