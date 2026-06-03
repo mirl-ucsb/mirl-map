@@ -1,16 +1,8 @@
 /* ============================================================================
-   photos.js — the photographs (REQUIRED)
-   ----------------------------------------------------------------------------
-   One block per photograph. Only file / lat / lon / caption are required.
-     bearing + fov  → draw the camera "sightline" cone (features.sightlines)
-     taken_at       → enable the walking-trail animation (features.walkingTrail)
-     source_ids     → citation tokens, keyed into js/data/sources.js
-   add_photo.py fills lat / lon / taken_at from a photo's EXIF automatically.
-
-   These entries were generated from the EXIF of the photographs in photos/
-   (GPS position, capture time, camera bearing, and field of view from the
-   35mm-equivalent focal length). Replace the captions with your own; see
-   CONTENT-GUIDE.md.
+   photos.js — GENERATED FILE. Do not edit by hand.
+   Built from content/photos/*.md by scripts/build_content.py (and in CI by
+   .github/workflows/build-content.yml). Edit photographs through /admin or by
+   editing content/photos/<id>.md; this file is overwritten on the next build.
    ============================================================================ */
 const photoInfo = [
   {
@@ -65,7 +57,7 @@ const photoInfo = [
   },
   {
     "file": "sample-6.jpeg",
-    "lat": 34.408000,
+    "lat": 34.408,
     "lon": -119.843742,
     "caption": "EDIT ME — caption for this photograph.",
     "source_ids": [],
