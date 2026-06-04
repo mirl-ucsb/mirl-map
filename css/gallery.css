@@ -1,6 +1,6 @@
-/* Gallery page — sage-green light theme, larger narrative text */
+/* Gallery page: Cartography theme, larger narrative text */
 
-body { background: #e8eed8; }
+body { background: #e9edf1; }
 
 #gallery {
   max-width: 860px;
@@ -9,7 +9,7 @@ body { background: #e8eed8; }
 }
 
 #gallery-intro {
-  border-bottom: 1px solid #a8b888;
+  border-bottom: 1px solid #c7d0d9;
   margin-bottom: 56px;
   padding-bottom: 32px;
 }
@@ -17,14 +17,14 @@ body { background: #e8eed8; }
 #gallery-intro h2 {
   font-size: 1.3rem;
   font-weight: normal;
-  color: #2e2818;
+  color: #1b2733;
   letter-spacing: .06em;
   margin-bottom: 14px;
 }
 
 #gallery-intro p {
   font-size: .98rem;
-  color: #3a3020;
+  color: #2c3a49;
   line-height: 1.78;
   max-width: 640px;
 }
@@ -33,7 +33,7 @@ body { background: #e8eed8; }
 .g-entry {
   margin-bottom: 72px;
   padding-bottom: 72px;
-  border-bottom: 1px solid #a8b888;
+  border-bottom: 1px solid #c7d0d9;
   scroll-margin-top: 70px;            /* keep entry below the sticky header on scroll-into-view */
   transition: box-shadow .35s ease, background-color .35s ease;
   border-radius: 4px;
@@ -42,15 +42,15 @@ body { background: #e8eed8; }
 
 /* Brief highlight when arrived via ?photo= permalink */
 .g-entry.g-highlight {
-  background-color: #f4f6e0;
-  box-shadow: 0 0 0 6px rgba(90,62,40,.18);
+  background-color: #f5f7f9;
+  box-shadow: 0 0 0 6px rgba(15,118,110,.18);
 }
 
 .g-photo-wrap {
   position: relative;
   cursor: zoom-in;
   margin-bottom: 0;
-  background: #c0cfa0;
+  background: #cdd7df;
 }
 
 .g-photo-wrap img {
@@ -74,12 +74,12 @@ body { background: #e8eed8; }
 
 .g-caption {
   font-size: 1.02rem;
-  color: #2e2818;
+  color: #1b2733;
   font-style: italic;
   line-height: 1.65;
   padding: 14px 18px 13px;
-  border-left: 3px solid #5a3e28;
-  background: #f2f4e2;
+  border-left: 3px solid #0f766e;
+  background: #f5f7f9;
   border-radius: 0 0 3px 3px;
   margin-bottom: 22px;
 }
@@ -87,14 +87,14 @@ body { background: #e8eed8; }
 .g-coords {
   font-size: .72rem;
   font-family: var(--font-mono);
-  color: #6e6240;
+  color: #5e6f82;
   letter-spacing: .03em;
   margin-bottom: 22px;
 }
 
 .g-context {
   font-size: 1.08rem;
-  color: #2e2818;
+  color: #1b2733;
   line-height: 1.85;
 }
 .g-context p { margin-bottom: 1.1em; }
@@ -103,7 +103,7 @@ body { background: #e8eed8; }
 .g-sources {
   margin-top: 22px;
   padding-top: 16px;
-  border-top: 1px solid #a8b888;
+  border-top: 1px solid #c7d0d9;
   display: flex;
   flex-wrap: wrap;
   gap: 6px 14px;
@@ -111,7 +111,7 @@ body { background: #e8eed8; }
 
 .g-source-label {
   font-size: .68rem;
-  color: #6e6240;
+  color: #5e6f82;
   letter-spacing: .08em;
   text-transform: uppercase;
   width: 100%;
@@ -120,14 +120,14 @@ body { background: #e8eed8; }
 
 .g-source-link {
   font-size: .8rem;
-  color: #5a3e28;
+  color: #0f766e;
   text-decoration: none;
   line-height: 1.5;
 }
-.g-source-link:hover { color: #7a5538; text-decoration: underline; }
+.g-source-link:hover { color: #0c5d56; text-decoration: underline; }
 .g-source-plain {
   font-size: .8rem;
-  color: #5e5238;
+  color: #46566a;
   line-height: 1.5;
 }
 
@@ -135,9 +135,9 @@ body { background: #e8eed8; }
 #gallery-footer {
   margin-top: 56px;
   padding-top: 24px;
-  border-top: 1px solid #a8b888;
+  border-top: 1px solid #c7d0d9;
   font-size: .78rem;
-  color: #5e5238;
+  color: #46566a;
   text-align: center;
   letter-spacing: .03em;
 }
@@ -170,7 +170,7 @@ body { background: #e8eed8; }
 }
 #lb-caption {
   font-size: .9rem;
-  color: #f0e8d0;
+  color: #eef3f7;
   max-width: 720px;
   text-align: center;
   line-height: 1.6;
@@ -182,7 +182,7 @@ body { background: #e8eed8; }
   top: 16px;
   right: 22px;
   font-size: 1.7rem;
-  color: #f0e8d0;
+  color: #eef3f7;
   cursor: pointer;
   background: none;
   border: none;
@@ -223,9 +223,9 @@ body { background: #e8eed8; }
   height: 182px;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid #a8b888;
-  box-shadow: 0 4px 18px rgba(40,40,20,.28);
-  background: #cdd6b8;
+  border: 1px solid #c7d0d9;
+  box-shadow: 0 4px 18px rgba(20,28,38,.28);
+  background: #cdd7df;
 }
 #scrolly-cap{
   display: flex;
@@ -233,19 +233,19 @@ body { background: #e8eed8; }
   align-items: baseline;
   font-family: var(--font-mono, monospace);
   font-size: .66rem;
-  color: #5a5438;
+  color: #46566a;
   padding: 5px 3px 0;
 }
-#scrolly-open{ color: #5a3e28; text-decoration: none; border-bottom: 1px dotted #a89870; }
-#scrolly-open:hover{ color: #7a5538; border-bottom-color: #5a3e28; }
+#scrolly-open{ color: #0f766e; text-decoration: none; border-bottom: 1px dotted #9aa9b8; }
+#scrolly-open:hover{ color: #0c5d56; border-bottom-color: #0f766e; }
 #scrolly-voice{
-  background: #f3f0e2;
-  border: 1px solid #a8b888;
-  border-left: 3px solid #c89048;
+  background: #f5f7f9;
+  border: 1px solid #c7d0d9;
+  border-left: 3px solid #d97706;
   border-radius: 5px;
   padding: 11px 13px;
   margin-bottom: 9px;
-  box-shadow: 0 4px 14px rgba(40,40,20,.18);
+  box-shadow: 0 4px 14px rgba(20,28,38,.18);
 }
 #scrolly-voice.sv-hidden{ display: none; }
 #scrolly-voice .sv-mark{
@@ -253,7 +253,7 @@ body { background: #e8eed8; }
   font-size: .57rem;
   letter-spacing: .09em;
   text-transform: uppercase;
-  color: #9a7a40;
+  color: #b45309;
   margin-bottom: 6px;
 }
 #scrolly-voice blockquote{
@@ -262,23 +262,23 @@ body { background: #e8eed8; }
   font-style: italic;
   font-size: .85rem;
   line-height: 1.5;
-  color: #2e2818;
+  color: #1b2733;
 }
-#scrolly-voice .sv-who{ font-size: .72rem; color: #3a3020; line-height: 1.4; }
-#scrolly-voice .sv-who span{ color: #6a6048; }
+#scrolly-voice .sv-who{ font-size: .72rem; color: #2c3a49; line-height: 1.4; }
+#scrolly-voice .sv-who span{ color: #5e6f82; }
 #scrolly-voice .sv-src{
   display: inline-block;
   margin-top: 5px;
   font-size: .63rem;
-  color: #5a3e28;
+  color: #0f766e;
   text-decoration: none;
-  border-bottom: 1px dotted #a89870;
+  border-bottom: 1px dotted #9aa9b8;
 }
-#scrolly-voice .sv-src:hover{ color: #7a5538; }
+#scrolly-voice .sv-src:hover{ color: #0c5d56; }
 /* Show the panel only where there is room beside the essay, and shift
    the reading column right so the panel never overlaps the text. */
 @media (max-width: 1079px){ #scrolly{ display: none; } }
 @media (min-width: 1080px){ #gallery{ margin-left: 312px; margin-right: auto; } }
 html.hc #scrolly-voice{ background: #fff; border-color: #1a3038; border-left-color: #1a3038; }
 html.hc #scrolly-voice blockquote{ color: #000; }
-html.hc #scrolly-voice .sv-who{ color: #1a1a1a; }
+html.hc #scrolly-voice .sv-who{ color: #11181f; }

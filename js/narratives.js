@@ -64,7 +64,7 @@ function _loadEnglishNarrative(base) {
 function renderNarrative(text) {
   // Editing mode: don't show narrative text at all
   if (NARRATIVES_HIDDEN) {
-    return '<p style="color:#85724e;font-style:italic;">Historical narratives are being edited and will be restored shortly.</p>';
+    return '<p style="color:#74859a;font-style:italic;">Historical narratives are being edited and will be restored shortly.</p>';
   }
   if (!text) return '';
   // Split on one or more blank lines; render each paragraph
