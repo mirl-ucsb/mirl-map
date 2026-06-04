@@ -38,7 +38,7 @@ const CONFIG = {
     // Social-preview + SEO. NOTE: these also live as <meta> tags in index.html
     // and gallery.html, which is what social/link crawlers actually read — edit
     // them there too when you change a project.
-    ogImage:      "photos/web/sample-1.jpeg",       // EDIT ME — 1200x630-ish hero image
+    ogImage:      "photos/web/sample-01.jpg",       // EDIT ME — 1200x630-ish hero image
     description:  "A documentary photo-map: geolocated photographs paired with per-photo narratives.",
     keywords:     "documentary, photo map, MIRL, archive, fieldwork"
   },
@@ -48,8 +48,8 @@ const CONFIG = {
      get one by right-clicking a spot in Google Maps. The default below is
      UC Santa Barbara (MIRL's home). */
   map: {
-    center:      [34.4114, -119.8434],   // EDIT ME — [lat, lon] (centroid of the sample photos)
-    zoom:        14,                       // EDIT ME — 1 (world) .. 19 (street)
+    center:      [34.4140, -119.8489],   // EDIT ME — [lat, lon]
+    zoom:        16,                       // EDIT ME — 1 (world) .. 19 (street)
     defaultBase: "satellite",              // id of the baseLayers entry shown first
     minZoom:     3
   },
