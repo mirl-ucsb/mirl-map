@@ -192,11 +192,11 @@ window.onLangChange = function () {
   L.tileLayer(_sspec.url, _sopts).addTo(smap);
 
   var cone = L.polygon([], {
-    color: '#c89048', weight: 1, opacity: 0.85,
-    fillColor: '#f0c068', fillOpacity: 0.30, interactive: false
+    color: '#d97706', weight: 1, opacity: 0.85,
+    fillColor: '#f59e0b', fillOpacity: 0.30, interactive: false
   }).addTo(smap);
   var dot = L.circleMarker(CONFIG.map.center, {
-    radius: 5, color: '#fff', weight: 2, fillColor: '#5a3e28', fillOpacity: 1, interactive: false
+    radius: 5, color: '#fff', weight: 2, fillColor: '#0f766e', fillOpacity: 1, interactive: false
   }).addTo(smap);
 
   var panel  = document.getElementById('scrolly');

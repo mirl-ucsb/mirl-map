@@ -89,8 +89,8 @@ if (CONFIG.miniMap && CONFIG.miniMap.enabled && typeof L.Control.MiniMap === 'fu
     zoomLevelOffset: (typeof CONFIG.miniMap.zoomOffset === 'number' ? CONFIG.miniMap.zoomOffset : -5),
     toggleDisplay: true,
     minimized: false,
-    aimingRectOptions:    { color: '#5a3e28', weight: 2, opacity: 0.85 },
-    shadowRectOptions:    { color: '#5a3e28', weight: 1, opacity: 0.4, fillOpacity: 0.15 }
+    aimingRectOptions:    { color: '#0f766e', weight: 2, opacity: 0.85 },
+    shadowRectOptions:    { color: '#0f766e', weight: 1, opacity: 0.4, fillOpacity: 0.15 }
   }).addTo(map);
 }
 
@@ -318,10 +318,10 @@ function _wedgeCoordsFor(p) {
 
 // Single reusable polygon — repositioned as the active photo changes.
 var activeViewshed = L.polygon([], {
-  color:       '#c89048',
+  color:       '#d97706',
   weight:      1.1,
   opacity:     0.75,
-  fillColor:   '#f0c068',
+  fillColor:   '#f59e0b',
   fillOpacity: 0.22,
   interactive: false,
   pane:        'overlayPane'
@@ -346,10 +346,10 @@ function hideActiveViewshed() {
    at without opening anything. Brighter than the all-at-once
    overview, lighter than the active (open-photo) wedge. */
 var hoverViewshed = L.polygon([], {
-  color:       '#c89048',
+  color:       '#d97706',
   weight:      1.0,
   opacity:     0.7,
-  fillColor:   '#f0c068',
+  fillColor:   '#f59e0b',
   fillOpacity: 0.26,
   interactive: false,
   pane:        'overlayPane'
@@ -377,10 +377,10 @@ var allViewsheds = L.layerGroup(
     if (!coords) return null;
     return L.polygon(coords, {
       stroke:      true,
-      color:       '#e0b060',
+      color:       '#d97706',
       weight:      0.4,
       opacity:     0.3,
-      fillColor:   '#f0c068',
+      fillColor:   '#f59e0b',
       fillOpacity: 0.10,
       interactive: false,
       pane:        'overlayPane'
@@ -667,12 +667,12 @@ document.getElementById('cite-modal').addEventListener('click', function (e) {
 
 function buildSrcHTML(ids){
   if(!ids||!ids.length) return '';
-  var h='<div style="margin-top:8px;padding-top:8px;border-top:1px solid #1e1c1a;">';
-  h+='<div style="font-size:.62rem;color:#3a3020;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;">Sources</div>';
+  var h='<div style="margin-top:8px;padding-top:8px;border-top:1px solid #cdd7df;">';
+  h+='<div style="font-size:.62rem;color:#2c3a49;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;">Sources</div>';
   ids.forEach(function(id){
     var s=srcLib[id]; if(!s) return;
-    if(s.url){ h+='<div style="margin-bottom:4px;"><a href="'+s.url+'" target="_blank" rel="noopener" style="font-size:.68rem;color:#6a5838;line-height:1.45;text-decoration:none;"><span style="margin-right:3px;opacity:.7;">&#8599;</span>'+s.label+'</a></div>'; }
-    else { h+='<div style="margin-bottom:4px;font-size:.68rem;color:#4a4030;line-height:1.45;">'+s.label+'</div>'; }
+    if(s.url){ h+='<div style="margin-bottom:4px;"><a href="'+s.url+'" target="_blank" rel="noopener" style="font-size:.68rem;color:#0f766e;line-height:1.45;text-decoration:none;"><span style="margin-right:3px;opacity:.7;">&#8599;</span>'+s.label+'</a></div>'; }
+    else { h+='<div style="margin-bottom:4px;font-size:.68rem;color:#3c4b5c;line-height:1.45;">'+s.label+'</div>'; }
   });
   return h+'</div>';
 }
@@ -686,7 +686,7 @@ var drawerIdx = -1;  // index of the photo currently shown in the drawer; -1 if 
    glance which marker on the map corresponds to the open photo. */
 var activeHalo = L.circleMarker([0, 0], {
   radius: 32,
-  color: '#5a3e28',
+  color: '#0f766e',
   weight: 3,
   fillOpacity: 0,
   opacity: 0.9,
@@ -716,13 +716,13 @@ function hideActiveHalo() {
 function openPhotoDrawer(idx){
   var p=photoInfo[idx];
   drawerIdx=idx;
-  document.getElementById('info-drawer-meta').innerHTML='<strong style="color:#8a7060;font-size:.72rem;">'+p.file+'</strong><br><span style="font-family:monospace;">'+fmtCoords(p.lat,p.lon)+'</span>';
+  document.getElementById('info-drawer-meta').innerHTML='<strong style="color:#5e6f82;font-size:.72rem;">'+p.file+'</strong><br><span style="font-family:monospace;">'+fmtCoords(p.lat,p.lon)+'</span>';
   var img=document.getElementById('info-drawer-img');
   img.src=CONFIG.images.web+photoInfo[idx].file; img.style.display='block';
   document.getElementById('info-drawer-caption').textContent=p.caption;
   var ctxEl=document.getElementById('info-drawer-context');
-  ctxEl.innerHTML='<p style="color:#85724e;font-style:italic;">Loading…</p>';
-  loadNarrative(p.file).then(function(text){ ctxEl.innerHTML = renderNarrative(text) || '<p style="color:#85724e;font-style:italic;">No narrative yet.</p>'; });
+  ctxEl.innerHTML='<p style="color:#74859a;font-style:italic;">Loading…</p>';
+  loadNarrative(p.file).then(function(text){ ctxEl.innerHTML = renderNarrative(text) || '<p style="color:#74859a;font-style:italic;">No narrative yet.</p>'; });
   document.getElementById('info-drawer-source').innerHTML=buildSrcHTML(p.source_ids);
   // Citation export button
   var citeEl = document.getElementById('info-drawer-cite');
@@ -773,8 +773,8 @@ function openLandmarkDrawer(lm){
   var col=SC[lm.status]||'#888';
   drawerIdx=-1;
   document.getElementById('info-drawer-meta').innerHTML=
-    '<div style="font-size:.9rem;color:#e8d8c0;direction:rtl;text-align:right;margin-bottom:2px;">'+lm.name_ar+'</div>'+
-    '<div style="font-size:.72rem;color:#6a6050;margin-bottom:4px;">'+lm.name_en+'</div>'+
+    '<div style="font-size:.9rem;color:#1b2733;direction:rtl;text-align:right;margin-bottom:2px;">'+lm.name_ar+'</div>'+
+    '<div style="font-size:.72rem;color:#46566a;margin-bottom:4px;">'+lm.name_en+'</div>'+
     '<span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:'+col+';display:inline-block;"></span><span style="font-size:.67rem;color:'+col+';">'+(SL[lm.status]||lm.status)+'</span></span>';
   var img=document.getElementById('info-drawer-img'); img.style.display='none'; img.src='';
   document.getElementById('info-drawer-caption').textContent='';
@@ -859,7 +859,7 @@ var trailPoints = photoInfo
 var trailLatLngs = trailPoints.map(function (p) { return [p.lat, p.lon]; });
 
 var trailPolyline = L.polyline([], {
-  color:       '#5a3e28',
+  color:       '#0f766e',
   weight:      2.5,
   opacity:     0.85,
   dashArray:   '6 5',
@@ -1000,18 +1000,18 @@ if (typeof places !== 'undefined') places.forEach(function(p){
   var endTxt = p.end ? ' · ' + p.end : '';
   m.bindTooltip(
     '<div style="text-align:right;direction:rtl;font-size:.95rem;line-height:1.2;">' + p.name_ar + '</div>' +
-    '<div style="font-size:.75rem;color:#5e5238;">' + p.name_en + '</div>',
+    '<div style="font-size:.75rem;color:#46566a;">' + p.name_en + '</div>',
     {sticky:true, direction:'top', offset:[0,-6]}
   );
   m.bindPopup(
     '<div style="padding:8px 4px 2px;min-width:210px;">' +
-      '<div style="font-size:1.05rem;color:#2e2818;direction:rtl;text-align:right;margin-bottom:3px;">' + p.name_ar + '</div>' +
-      '<div style="font-size:.86rem;color:#3a3020;margin-bottom:10px;">' + p.name_en + '</div>' +
+      '<div style="font-size:1.05rem;color:#1b2733;direction:rtl;text-align:right;margin-bottom:3px;">' + p.name_ar + '</div>' +
+      '<div style="font-size:.86rem;color:#2c3a49;margin-bottom:10px;">' + p.name_en + '</div>' +
       '<div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:5px;">' +
         '<span style="width:11px;height:11px;border-radius:50%;background:' + color + ';display:inline-block;border:1.5px solid #fff;box-shadow:0 0 0 1px ' + color + ';"></span>' +
         '<span style="font-size:.78rem;color:' + color + ';font-weight:bold;">' + p.status + endTxt + '</span>' +
       '</div>' +
-      '<div style="font-size:.7rem;color:#6e6240;letter-spacing:.02em;">' + p.type + ' · ' + p.group + '</div>' +
+      '<div style="font-size:.7rem;color:#5e6f82;letter-spacing:.02em;">' + p.type + ' · ' + p.group + '</div>' +
     '</div>'
   );
   placesMarkersArr.push(m);
@@ -1069,7 +1069,7 @@ if (typeof testimonies !== 'undefined' && Array.isArray(testimonies)) {
     });
     m.bindTooltip(
       '<div style="text-align:right;direction:rtl;font-size:.95rem;line-height:1.2;">' + (t.speaker_ar || '') + '</div>' +
-      '<div style="font-size:.75rem;color:#5e5238;">' + t.speaker_en + '</div>',
+      '<div style="font-size:.75rem;color:#46566a;">' + t.speaker_en + '</div>',
       { sticky: true, direction: 'top', offset: [0, -6] }
     );
     m.bindPopup(buildTestimonyPopup(t), { maxWidth: 320 });
@@ -1146,7 +1146,7 @@ if (typeof matsonPhotos !== 'undefined' && Array.isArray(matsonPhotos)) {
   matsonPhotos.forEach(function (m) {
     var marker = L.circleMarker([m.lat, m.lon], {
       radius: 8,
-      fillColor: '#a87a3a',
+      fillColor: '#b45309',
       color: '#ffffff',
       weight: 2.5,
       fillOpacity: 0.92,
@@ -1154,8 +1154,8 @@ if (typeof matsonPhotos !== 'undefined' && Array.isArray(matsonPhotos)) {
       pane: 'overlayPane'
     });
     marker.bindTooltip(
-      '<div style="font-size:.85rem;color:#2e2818;font-style:italic;">' + m.title + '</div>' +
-      '<div style="font-size:.72rem;color:#85724e;">' + m.date + ' &middot; Matson</div>',
+      '<div style="font-size:.85rem;color:#1b2733;font-style:italic;">' + m.title + '</div>' +
+      '<div style="font-size:.72rem;color:#74859a;">' + m.date + ' &middot; Matson</div>',
       { sticky: true, direction: 'top', offset: [0, -6] }
     );
     marker.bindPopup(function () { return buildMatsonPopup(m); }, { maxWidth: 340, minWidth: 280 });
@@ -1188,7 +1188,7 @@ var mcg=L.markerClusterGroup({
   maxClusterRadius:48,spiderfyOnMaxZoom:true,showCoverageOnHover:false,zoomToBoundsOnClick:true,
   iconCreateFunction:function(cluster){
     var n=cluster.getChildCount();
-    return L.divIcon({html:'<div style="width:44px;height:44px;border-radius:4px;background:rgba(90,62,40,.88);border:2px solid rgba(255,220,160,.7);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.6);font-family:Georgia,serif;font-size:.85rem;color:#e8d8c0;">'+n+'</div>',className:'',iconSize:[44,44],iconAnchor:[22,22]});
+    return L.divIcon({html:'<div style="width:44px;height:44px;border-radius:4px;background:rgba(15,118,110,.92);border:2px solid rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.45);font-family:Inter,system-ui,sans-serif;font-size:.82rem;font-weight:600;color:#eef3f7;">'+n+'</div>',className:'',iconSize:[44,44],iconAnchor:[22,22]});
   }
 });
 
