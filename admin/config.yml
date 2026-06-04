@@ -6,15 +6,16 @@
 # repo, and a GitHub Action (.github/workflows/build-content.yml) regenerates
 # js/data/photos.js, the narratives, and the web/thumb tiers.
 #
-# ONE-TIME SETUP (see ADMIN-SETUP.md): register a GitHub OAuth App and deploy a
-# small token-exchange proxy, then fill in `repo` and `base_url` below.
+# The "Log in with GitHub" sign-in is handled by MIRL's shared login helper
+# (the base_url below is already set), so you register no OAuth app of your own.
+# To publish your own map you only set `repo` to your repository. See ADMIN-SETUP.md.
 # ============================================================================
 
 backend:
   name: github
-  repo: YOUR-USER/mirl-map            # EDIT ME — your GitHub "owner/repo"
+  repo: YOUR-USER/mirl-map                               # EDIT ME — your GitHub "owner/repo"
   branch: main
-  base_url: https://YOUR-OAUTH-PROXY  # EDIT ME — your OAuth proxy URL (ADMIN-SETUP.md)
+  base_url: https://mirl-map-auth.mirl-ucsb.workers.dev  # MIRL's shared login helper (leave as-is)
 
 # Test the CMS locally with no login:  run `npx decap-server` then open
 # http://localhost:8766/admin/  — Decap will read/write your local files.
