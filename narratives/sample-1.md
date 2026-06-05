@@ -1,5 +1,5 @@
-This is a sample narrative, paired with the photograph `sample-1.jpeg` (so the file is `narratives/sample-1.md`). Every photograph can have one, written in plain Markdown.
+The marine layer keeps July gray here for weeks, and the light flattens everything to the same soft pewter: water, sky, and the worn track through the iceplant. The county pier on the left runs out into the haze.
 
-Blank lines separate paragraphs. You can use **bold** and *italic*. A citation token like [SAMP] renders as a superscript link to the matching entry in `js/data/sources.js`, and a deduplicated source list appears automatically beneath the narrative. You can cite a page too, like [SAMP p.12].
+It is easy to read this as a permanent place. It is not. Like much of the California coast, these bluffs are slowly giving way to the water below them, retreating statewide by an average of about a third of a meter a year over the past century.[USGS] The ground a photograph like this stands on is, very slowly, leaving.
 
-**EDIT ME** — replace this with your own writing, and set your own editorial voice.
+Nothing on the bluff announces that. You have to know to look.
