@@ -147,3 +147,19 @@ the University of California, Santa Barbara. It grew out of a documentary map of
 the village of Lifta and was generalized so that anyone can tell the story of a
 place. The map itself is drawn using OpenStreetMap and Esri imagery, and the code is
 openly commented for anyone who would like to look under the hood.
+
+---
+
+## License
+
+The MIRL Map platform, meaning its code, styles, templates, and documentation, is
+released under the MIT License. You are free to use it, fork it, and adapt it for
+your own projects. The full text is in [LICENSE](LICENSE).
+
+The license covers the platform, not what you put into it. Your photographs and your
+writing stay entirely yours, to license however you wish. The sample photographs in
+this template remain the copyright of Jeff O'Brien and are included only as
+placeholder demo content, meant to be replaced with your own.
+
+MIRL Map bundles one third-party component, leaflet-side-by-side (MIT), by Digital
+Democracy.

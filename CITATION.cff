@@ -2,6 +2,7 @@ cff-version: 1.2.0
 title: "mirl-map: A reusable documentary photo-map platform"
 message: "If you use this software, please cite it as below. EDIT ME: update the URLs (and your name) when you fork."
 type: software
+license: MIT
 authors:
   - family-names: "O'Brien"
     given-names: "Jeff"
