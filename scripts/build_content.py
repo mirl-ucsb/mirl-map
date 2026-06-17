@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-build_content.py — compile the editable content into what the site engine loads.
+build_content.py: compile the editable content into what the site engine loads.
 
 The CMS (and hand-editors) write one Markdown file per photograph in
 content/photos/<id>.md: YAML frontmatter (image, caption, lat, lon, bearing, fov,
@@ -13,7 +13,7 @@ that source of truth into the files the static engine consumes:
 
 Any of lat / lon / bearing / fov / taken_at left blank in the frontmatter are
 filled from the photograph's EXIF (GPS position, GPSImgDirection, and the field
-of view computed from the 35mm-equivalent focal length) — the same logic as
+of view computed from the 35mm-equivalent focal length). It is the same logic as
 add_photo.py and make_thumbs.py, kept self-contained here so CI needs nothing
 but Pillow + PyYAML.
 
@@ -36,11 +36,13 @@ CONTENT_DIR = os.path.join(REPO, "content", "photos")
 PHOTOS_DIR  = os.path.join(REPO, "photos")
 PHOTOS_JS   = os.path.join(REPO, "js", "data", "photos.js")
 NARR_DIR    = os.path.join(REPO, "narratives")
+SETTINGS_YML = os.path.join(REPO, "content", "settings.yml")
+SETTINGS_JS  = os.path.join(REPO, "js", "data", "settings.js")
 TIERS       = [("thumb", 480, 80), ("web", 1400, 82)]
 
 HEADER = (
     "/* ============================================================================\n"
-    "   photos.js — GENERATED FILE. Do not edit by hand.\n"
+    "   photos.js: GENERATED FILE. Do not edit by hand.\n"
     "   Built from content/photos/*.md by scripts/build_content.py (and in CI by\n"
     "   .github/workflows/build-content.yml). Edit photographs through /admin or by\n"
     "   editing content/photos/<id>.md; this file is overwritten on the next build.\n"
@@ -132,10 +134,34 @@ def ensure_tiers(filename):
                quality=q, optimize=True, progressive=True)
         print(f"  tier  photos/{name}/{filename}")
 
+# ── Map settings (content/settings.yml → js/data/settings.js) ───────────────
+def build_settings():
+    """Compile the editable map identity (title, subtitle, intro, about, credit)
+    into js/data/settings.js, the SITE object the engine overlays onto the page.
+    A missing or empty settings.yml yields an empty SITE, so the HTML/config
+    defaults stand."""
+    data = {}
+    if os.path.exists(SETTINGS_YML):
+        try:
+            data = yaml.safe_load(open(SETTINGS_YML, encoding="utf-8")) or {}
+        except Exception as e:
+            print(f"  WARNING: could not parse settings.yml ({e}); writing empty SITE.")
+            data = {}
+    site = {k: data[k] for k in ("title", "subtitle", "intro", "about", "credit")
+            if isinstance(data, dict) and str(data.get(k) or "").strip()}
+    body = ("/* settings.js: GENERATED from content/settings.yml by "
+            "scripts/build_content.py. Do not edit by hand. */\n"
+            "const SITE = " + json.dumps(site, ensure_ascii=False) + ";\n")
+    os.makedirs(os.path.dirname(SETTINGS_JS), exist_ok=True)
+    with open(SETTINGS_JS, "w", encoding="utf-8") as f:
+        f.write(body)
+    print(f"  settings   js/data/settings.js ({len(site)} field(s))")
+
 # ── Main ────────────────────────────────────────────────────────────────────
 def main():
+    build_settings()
     if not os.path.isdir(CONTENT_DIR):
-        print(f"No {CONTENT_DIR} — nothing to build (the template's hand-edited "
+        print(f"No {CONTENT_DIR}: nothing to build (the template's hand-edited "
               f"photos.js is left untouched).")
         return
 

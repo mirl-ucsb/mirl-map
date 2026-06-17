@@ -1,5 +1,5 @@
 # ============================================================================
-# mirl-map content admin — Decap CMS configuration
+# mirl-map content admin: the CMS configuration (Sveltia CMS)
 # ----------------------------------------------------------------------------
 # This powers the /admin editor. Editors log in with GitHub and add/edit
 # photographs, captions, and narratives; their changes are committed to the
@@ -13,13 +13,13 @@
 
 backend:
   name: github
-  repo: YOUR-USER/mirl-map                               # EDIT ME — your GitHub "owner/repo"
+  repo: YOUR-USER/mirl-map                               # EDIT ME: your GitHub "owner/repo"
   branch: main
   base_url: https://mirl-map-auth.mirl-ucsb.workers.dev  # MIRL's shared login helper (leave as-is)
 
-# Test the CMS locally with no login:  run `npx decap-server` then open
-# http://localhost:8766/admin/  — Decap will read/write your local files.
-local_backend: true
+# To test the CMS locally, open /admin/ and click "Work with Local Repository",
+# then choose this repo's folder. Sveltia reads and writes your local files
+# directly through the browser, with no separate server to run.
 
 # Uploaded photographs are committed here (full resolution); the Action makes
 # the web/thumb tiers afterward.
@@ -27,6 +27,22 @@ media_folder: "photos"
 public_folder: "/photos"
 
 collections:
+  - name: "settings"
+    label: "Map details"
+    description: "The name and words that frame your map: its title, tagline, the welcome paragraph on the opening screen, the About note, and the credit line. Edit these, save, and your map rebuilds and republishes on its own within a minute or two."
+    delete: false
+    files:
+      - name: "details"
+        label: "Map details"
+        file: "content/settings.yml"
+        format: "yaml"
+        fields:
+          - { name: "title",    label: "Title",    widget: "string", required: false, hint: "The big title on your map and the browser tab." }
+          - { name: "subtitle", label: "Tagline",  widget: "string", required: false, hint: "A short line under the title." }
+          - { name: "intro",    label: "Welcome paragraph", widget: "text", required: false, hint: "A sentence or two on the opening screen, introducing the place or story." }
+          - { name: "about",    label: "About note", widget: "text", required: false, hint: "A longer note about the project and who made it, shown in the About panel." }
+          - { name: "credit",   label: "Credit line", widget: "string", required: false, hint: "Shown at the foot of the page, e.g. Photographs and text by Jane Doe." }
+
   - name: "photographs"
     label: "Photographs"
     label_singular: "Photograph"

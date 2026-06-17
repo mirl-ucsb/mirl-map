@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIRL Map</title>
+<title>A Documentary Map</title>
 
-<!-- SEO / social. EDIT ME: update these (and js/config.js) when you fork. -->
+<!-- SEO / social. EDIT ME: update these when you publish your map. -->
 <meta name="description" content="A documentary photo-map: geolocated photographs paired with per-photo narratives.">
-<meta name="author" content="Jeff O'Brien">
-<meta name="keywords" content="documentary, photo map, MIRL, archive, fieldwork">
+<meta name="author" content="">
+<meta name="keywords" content="documentary, photo map, photographs, archive">
 <link rel="canonical" href="https://YOUR-USER.github.io/mirl-map/">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="MIRL Map">
-<meta property="og:title" content="MIRL Map">
+<meta property="og:site_name" content="A Documentary Map">
+<meta property="og:title" content="A Documentary Map">
 <meta property="og:description" content="A documentary photo-map: geolocated photographs paired with per-photo narratives.">
 <meta property="og:url" content="https://YOUR-USER.github.io/mirl-map/">
-<meta property="og:image" content="https://YOUR-USER.github.io/mirl-map/photos/web/sample-1.jpeg">
+<meta property="og:image" content="https://YOUR-USER.github.io/mirl-map/photos/web/example.jpeg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="MIRL Map">
+<meta name="twitter:title" content="A Documentary Map">
 <meta name="twitter:description" content="A documentary photo-map: geolocated photographs paired with per-photo narratives.">
-<meta name="twitter:image" content="https://YOUR-USER.github.io/mirl-map/photos/web/sample-1.jpeg">
+<meta name="twitter:image" content="https://YOUR-USER.github.io/mirl-map/photos/web/example.jpeg">
 
 <!-- Favicon: a neutral map-pin mark (data URL, no file needed). -->
 <meta name="theme-color" content="#1b2733">
@@ -32,11 +32,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet-minimap@3.6.1/dist/Control.MiniMap.min.css"/>
-<link rel="stylesheet" href="css/style.css?v=7"/>
-<link rel="stylesheet" href="css/a11y.css?v=7"/>
+<link rel="stylesheet" href="css/style.css?v=8"/>
+<link rel="stylesheet" href="css/a11y.css?v=8"/>
 
 <!-- CONFIG loads FIRST so every other script (and the inline script below) can read it. -->
-<script src="js/config.js?v=7"></script>
+<script src="js/config.js?v=8"></script>
+<script src="js/data/settings.js?v=8"></script>
 <script>
   /* Skip the intro overlay when arriving via permalink (?photo=…) so shared
      links go straight to the photo. Done in <head> to avoid a flash. */
@@ -58,7 +59,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
-<script src="js/lib/leaflet-side-by-side.js?v=7"></script>
+<script src="js/lib/leaflet-side-by-side.js?v=8"></script>
 <script src="https://unpkg.com/leaflet-minimap@3.6.1/dist/Control.MiniMap.min.js"></script>
 </head>
 <body>
@@ -68,16 +69,13 @@
   <div class="intro-card">
     <div class="intro-header">
       <div class="intro-title-ar" data-site-title-alt></div>
-      <h1 class="intro-title-en" data-i18n="intro.title">MIRL Map</h1>
-      <div class="intro-subtitle" data-i18n="intro.subtitle">A documentary photo-map</div>
+      <h1 class="intro-title-en" data-i18n="intro.title" data-settings="title">A Documentary Map</h1>
+      <div class="intro-subtitle" data-i18n="intro.subtitle" data-settings="subtitle">A documentary photo-map</div>
     </div>
 
-    <p class="intro-para" data-i18n="intro.p1">
-      A short walk along the southern edge of UC Santa Barbara, where the campus
-      gives way to bluff, chaparral, and the sea. These photographs return to that
-      seam across a few years and seasons: an entrance monument, a warning sign at
-      a slipping cliff, a storage container left on the sand, the Channel Islands
-      held on the horizon. Read it as a map, or top to bottom as a walk.
+    <p class="intro-para" data-i18n="intro.p1" data-settings="intro">
+      Welcome to your map. Replace this with a sentence or two about the place or
+      story it documents, then add your photographs in the editor.
     </p>
 
     <div class="intro-tip" data-i18n-html="intro.tip">
@@ -92,7 +90,7 @@
       <a href="gallery.html" class="intro-btn intro-btn-secondary" data-feature="gallery" data-i18n="intro.essay">View as photo essay</a>
     </div>
 
-    <div class="intro-credit" data-i18n="intro.credit">Photographs and text by Jeff O'Brien, Material / Image Research Lab, UC Santa Barbara.</div>
+    <div class="intro-credit" data-i18n="intro.credit" data-settings="credit">Photographs and text by you.</div>
   </div>
 </div>
 
@@ -100,7 +98,7 @@
 <div id="header">
   <div class="header-left">
     <h1><span data-site-title>MIRL Map</span></h1>
-    <span class="sub" data-i18n="head.sub">A documentary map</span>
+    <span class="sub" data-i18n="head.sub" data-settings="subtitle">A documentary map</span>
   </div>
   <div id="header-controls">
     <!-- Base-layer buttons are generated from CONFIG.baseLayers -->
@@ -349,7 +347,7 @@
 <div id="about-panel" role="region" aria-label="About this project">
   <button id="about-close" onclick="toggleAbout()" aria-label="Close about panel">&#x2715;</button>
   <h2><span data-site-title>MIRL Map</span></h2>
-  <p>A short documentary walk along the coastal edge of UC Santa Barbara, by Jeff O'Brien. Built with MIRL Map, a documentary photo-map platform from the Material / Image Research Lab, UC Santa Barbara.</p>
+  <p data-settings="about">A short note about this project and who made it. You can edit it in the Map details form.</p>
 </div>
 
 <div id="search-panel" role="dialog" aria-label="Search photos">
@@ -407,23 +405,23 @@
 
 
 <!-- Content data (edit these). Module files may be empty; see CONTENT-GUIDE.md. -->
-<script src="js/data/photos.js?v=7"></script>
-<script src="js/data/sources.js?v=7"></script>
-<script src="js/data/landmarks.js?v=7"></script>
-<script src="js/data/places.js?v=7"></script>
-<script src="js/data/testimonies.js?v=7"></script>
-<script src="js/data/matson.js?v=7"></script>
-<script src="js/data/greenline.js?v=7"></script>
-<script src="js/data/geodata.js?v=7"></script>
-<script src="js/data/timeline.js?v=7"></script>
-<script src="js/data/stats.js?v=7"></script>
-<script src="js/data/i18n.js?v=7"></script>
+<script src="js/data/photos.js?v=8"></script>
+<script src="js/data/sources.js?v=8"></script>
+<script src="js/data/landmarks.js?v=8"></script>
+<script src="js/data/places.js?v=8"></script>
+<script src="js/data/testimonies.js?v=8"></script>
+<script src="js/data/matson.js?v=8"></script>
+<script src="js/data/greenline.js?v=8"></script>
+<script src="js/data/geodata.js?v=8"></script>
+<script src="js/data/timeline.js?v=8"></script>
+<script src="js/data/stats.js?v=8"></script>
+<script src="js/data/i18n.js?v=8"></script>
 <!-- Engine (do not normally edit) -->
-<script src="js/a11y.js?v=7"></script>
-<script src="js/i18n.js?v=7"></script>
-<script src="js/help.js?v=7"></script>
-<script src="js/kml.js?v=7"></script>
-<script src="js/narratives.js?v=7"></script>
-<script src="js/map.js?v=7"></script>
+<script src="js/a11y.js?v=8"></script>
+<script src="js/i18n.js?v=8"></script>
+<script src="js/help.js?v=8"></script>
+<script src="js/kml.js?v=8"></script>
+<script src="js/narratives.js?v=8"></script>
+<script src="js/map.js?v=8"></script>
 </body>
 </html>

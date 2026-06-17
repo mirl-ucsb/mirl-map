@@ -18,40 +18,42 @@ const CONFIG = {
      Names, author, and the public URL. The visible title bar, the browser
      tab title, and the citation/KML exports all read from here. */
   site: {
-    title:     "MIRL Map",                         // EDIT ME — shown in the header and tab
-    subtitle:  "A documentary photo-map",          // EDIT ME — small line under the title
+    // The visible title, tagline, intro, about, and credit are edited in the
+    // "Map details" form (content/settings.yml). The values here are only
+    // fallbacks used when a field is left blank.
+    title:     "A Documentary Map",                // fallback title
+    subtitle:  "A documentary photo-map",          // fallback tagline
     titleAlt:  "",                                 // optional second-script title (e.g. Arabic); "" hides it
 
     storagePrefix: "mirlmap",                       // localStorage key prefix (a11y + language). Keep it short and unique.
 
-    // Credit + citation identity
-    author:          "Jeff O'Brien",                // EDIT ME — photographer / author, natural order
-    authorLastFirst: "O'Brien, Jeff",               // "Last, First" for MLA/Chicago
-    authorAPA:       "O'Brien, J.",                 // "Last, F." for APA
-    org:             "Material / Image Research Lab (MIRL), UC Santa Barbara",
+    // Citation identity for the "cite this photograph" export.
+    author:          "Your Name",                   // EDIT ME: photographer / author, natural order
+    authorLastFirst: "Name, Your",                  // "Last, First" for MLA/Chicago
+    authorAPA:       "Name, Y.",                     // "Last, F." for APA
+    org:             "",                             // optional institution / project
     rights:          "All rights reserved.",        // shown in the footer/credit line
 
     // Public address of the deployed site. Used by permalinks in citations and
-    // the KML export so shared links keep working. Set this before you deploy.
+    // the KML export. Set automatically when you create a map through MIRL Map.
     baseUrl:  "https://YOUR-USER.github.io/mirl-map/",   // EDIT ME (trailing slash)
 
-    // Social-preview + SEO. NOTE: these also live as <meta> tags in index.html
-    // and gallery.html, which is what social/link crawlers actually read — edit
-    // them there too when you change a project.
-    ogImage:      "photos/web/sample-1.jpeg",       // EDIT ME — 1200x630-ish hero image
+    // Social-preview + SEO. These also live as <meta> tags in index.html and
+    // gallery.html, which is what social/link crawlers actually read.
+    ogImage:      "photos/web/example.jpeg",        // EDIT ME: 1200x630-ish hero image
     description:  "A documentary photo-map: geolocated photographs paired with per-photo narratives.",
-    keywords:     "documentary, photo map, MIRL, archive, fieldwork"
+    keywords:     "documentary, photo map, photographs, archive"
   },
 
   /* ── Map ───────────────────────────────────────────────────────────────
-     Where the map opens. center is [latitude, longitude] in decimal degrees;
-     get one by right-clicking a spot in Google Maps. The default below is
-     UC Santa Barbara (MIRL's home). */
+     The map automatically opens on your photographs. center / zoom below are
+     only the fallback view, shown briefly before the photos load and used when
+     a map has none yet. */
   map: {
-    center:      [34.4114, -119.8434],   // EDIT ME — [lat, lon] (centroid of the sample photos)
-    zoom:        14,                       // EDIT ME — 1 (world) .. 19 (street)
+    center:      [20, 0],                  // neutral fallback; the map auto-centers on your photos
+    zoom:        2,
     defaultBase: "satellite",              // id of the baseLayers entry shown first
-    minZoom:     3
+    minZoom:     2
   },
 
   /* Locator inset (the little map in the bottom-left that shows where you are
@@ -64,7 +66,7 @@ const CONFIG = {
      (satellite) + Esri World Topo. Add/remove entries freely; `defaultBase`
      above must match one `id`.
 
-     Fields: id (unique), label (button text), url, attribution (required —
+     Fields: id (unique), label (button text), url, attribution (required,
      credit the source), maxZoom. Optional: subdomains:["a","b","c"] when the
      url has {s}; langVariants for localized tiles (see the commented example). */
   baseLayers: [
@@ -149,7 +151,7 @@ const CONFIG = {
     kmlExport:        true,    // "Download .kml" for Google Earth
     miniMap:          true,    // the locator inset (also see miniMap.enabled)
     gallery:          true,    // the photo-essay page (gallery.html)
-    wander:           true,    // "Wander" — jump to a random photo
+    wander:           true,    // "Wander", jump to a random photo
     intro:            true,    // the opening intro/about splash
     lightbox:         true,    // full-size photo overlay
 
@@ -174,17 +176,17 @@ const CONFIG = {
      Powers the "Cite this photograph" modal. placeLabel is appended to each
      citation (e.g. "Lifta, Palestine"); leave "" to omit. */
   citation: {
-    project:      "MIRL Map",          // EDIT ME — title of the project as cited
-    projectPlain: "MIRL Map",          // plain-text variant (no diacritics/scripts)
+    project:      "A Documentary Map",  // EDIT ME: title of the project as cited
+    projectPlain: "A Documentary Map",  // plain-text variant (no diacritics/scripts)
     placeLabel:   "",                  // e.g. "Santa Barbara, California"; "" = omit
-    bibtexPrefix: "mirlmap"            // BibTeX key prefix, e.g. mirlmap_sample_01
+    bibtexPrefix: "map"                // BibTeX key prefix, e.g. map_photo_01
   },
 
   /* ── KML / Google Earth export ─────────────────────────────────────────── */
   kml: {
-    filename:    "mirl-map.kml",
-    docName:     "MIRL Map — photographs",
-    attribution: "Photographs and data assembled with mirl-map. Map sources cited per layer."
+    filename:    "documentary-map.kml",
+    docName:     "Documentary map photographs",
+    attribution: "Photographs and data assembled with MIRL Map. Map sources cited per layer."
   }
 };
 

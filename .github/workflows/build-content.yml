@@ -3,11 +3,12 @@
 # narratives, and the web/thumb image tiers. Runs scripts/build_content.py and
 # commits the regenerated files back to main; the Pages deploy then publishes.
 #
-# Loop-safe: this triggers ONLY on the source paths (content/photos/** and new
-# top-level photos/* originals). Its own commit touches only the GENERATED paths
-# (js/data/photos.js, narratives/**, photos/web/**, photos/thumb/**), which do
-# not match the triggers, so it never re-runs itself. (The Pages workflow does
-# redeploy once — that is the intended outcome.)
+# Loop-safe: this triggers ONLY on the source paths (content/photos/**,
+# content/settings.yml, and new top-level photos/* originals). Its own commit
+# touches only the GENERATED paths (js/data/photos.js, js/data/settings.js,
+# narratives/**, photos/web/**, photos/thumb/**), which do not match the
+# triggers, so it never re-runs itself. (The Pages workflow does redeploy
+# once, which is the intended outcome.)
 name: Build content
 
 on:
@@ -15,6 +16,7 @@ on:
     branches: [main]
     paths:
       - 'content/photos/**'
+      - 'content/settings.yml'   # the "Map details" form
       - 'photos/*'          # new full-res originals only (not photos/web|thumb tiers)
   workflow_dispatch:
 
@@ -41,7 +43,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add js/data/photos.js narratives photos/web photos/thumb
+          git add js/data/photos.js js/data/settings.js narratives photos/web photos/thumb
           if git diff --cached --quiet; then
             echo "No generated changes."
           else

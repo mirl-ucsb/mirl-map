@@ -1224,6 +1224,16 @@ photoInfo.forEach(function(p, idx){
 
 map.addLayer(mcg);
 
+/* Open on the photographs: fit the view to their bounds (with a sensible zoom
+   cap so a single photo does not slam to max zoom). With no photographs, the
+   initial CONFIG.map.center / zoom set at map creation stands. */
+if (photoInfo.length) {
+  try {
+    map.fitBounds(L.latLngBounds(photoInfo.map(function (p) { return [p.lat, p.lon]; })),
+                  { padding: [40, 40], maxZoom: 15 });
+  } catch (e) {}
+}
+
 /* ── Feature flags ─────────────────────────────────────────
    Hide any element tagged data-feature="X" whose CONFIG.features.X is false,
    and the language toggle when there is no second language. This is what makes

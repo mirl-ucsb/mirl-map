@@ -1,15 +1,15 @@
 /* ============================================================================
-   sources.js: the citation library (optional but recommended)
+   sources.js: the citation library (optional)
    ----------------------------------------------------------------------------
-   Tokens are 2 to 8 uppercase letters. Anywhere in a narrative, caption,
-   timeline entry, or stats row, [USGS] or [USGS p.27] renders as a superscript
-   link, and a deduplicated source list is auto-appended under each narrative.
-   The "Sources" panel lists every entry here. url:"" renders a non-link
-   (e.g. a print-only book). See CONTENT-GUIDE.md.
+   Add an entry for any source you cite. A token of 2 to 8 uppercase letters,
+   such as [SMITH] or [SMITH p.27], placed in a caption or narrative then renders
+   as a superscript link, and a deduplicated source list appears under the
+   narrative. url:"" renders a non-link (e.g. a print-only book). For example:
+
+     const srcLib = {
+       "SMITH": { "label": "Smith, J., A Book (Publisher, 2024).", "url": "https://example.org/" }
+     };
+
+   See CONTENT-GUIDE.md.
    ============================================================================ */
-const srcLib = {
-  "USGS": {
-    "label": "Hapke, C. J., and Reid, D., National Assessment of Shoreline Change, Part 4: Historical Coastal Cliff Retreat along the California Coast (U.S. Geological Survey Open-File Report 2007-1133, 2007).",
-    "url": "https://pubs.usgs.gov/of/2007/1133/of2007-1133.pdf"
-  }
-};
+const srcLib = {};

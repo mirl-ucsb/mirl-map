@@ -1,0 +1,2 @@
+/* settings.js: GENERATED from content/settings.yml by scripts/build_content.py. Do not edit by hand. */
+const SITE = {"title": "Your map title", "subtitle": "A documentary photo-map", "intro": "Welcome to your map. Replace this with a sentence or two about the place or story it documents, then add your photographs in the editor.", "about": "A short note about this project and who made it. You can edit it in the Map details form.", "credit": "Photographs and text by you."};
