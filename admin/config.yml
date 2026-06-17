@@ -30,7 +30,7 @@ collections:
   - name: "photographs"
     label: "Photographs"
     label_singular: "Photograph"
-    description: "Add a photograph, its caption, and (optionally) a narrative. Coordinates, camera bearing, and time are read from the photo automatically when left blank."
+    description: "Add each photograph with a caption, and a short story if you like. Every time you save, your map rebuilds and republishes on its own, and the new photo appears on it within a minute or two. A photo's location and camera direction are read from its GPS automatically."
     folder: "content/photos"
     create: true
     identifier_field: "caption"
