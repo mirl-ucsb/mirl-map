@@ -58,7 +58,12 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add js/data/photos.js js/data/settings.js narratives photos/web photos/thumb
+          # Stage each generated path independently and tolerate any that are
+          # absent (a map with no photographs yet has no photos/web or photos/thumb),
+          # so a missing folder can never abort the deploy below.
+          for p in js/data/photos.js js/data/settings.js narratives photos/web photos/thumb; do
+            git add "$p" 2>/dev/null || true
+          done
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
           else
