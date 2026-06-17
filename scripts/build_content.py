@@ -98,6 +98,37 @@ def image_basename(fm):
     img = (fm.get("image") or "").strip()
     return os.path.basename(img) if img else ""
 
+def parse_location(fm):
+    """Read the optional 'location' field set by the editor's map ("click to place")
+    widget. It may arrive as a GeoJSON Point (dict or JSON string, coordinates are
+    [lon, lat]) or a plain "lat, lon" string. Returns (lat, lon) or (None, None)."""
+    loc = fm.get("location")
+    if not loc:
+        return (None, None)
+    if isinstance(loc, str):
+        loc = loc.strip()
+        if loc.startswith("{"):
+            try:
+                loc = json.loads(loc)
+            except Exception:
+                return (None, None)
+        else:
+            parts = [p.strip() for p in loc.split(",")]
+            if len(parts) == 2:
+                try:
+                    return (float(parts[0]), float(parts[1]))
+                except ValueError:
+                    return (None, None)
+            return (None, None)
+    if isinstance(loc, dict):
+        c = loc.get("coordinates")
+        if isinstance(c, (list, tuple)) and len(c) >= 2:
+            try:
+                return (float(c[1]), float(c[0]))   # GeoJSON order is [lon, lat]
+            except (TypeError, ValueError):
+                return (None, None)
+    return (None, None)
+
 # ── photos.js emitter (readable, one entry per block) ───────────────────────
 def emit_photos_js(entries):
     blocks = []
@@ -147,8 +178,25 @@ def build_settings():
         except Exception as e:
             print(f"  WARNING: could not parse settings.yml ({e}); writing empty SITE.")
             data = {}
-    site = {k: data[k] for k in ("title", "subtitle", "intro", "about", "credit")
-            if isinstance(data, dict) and str(data.get(k) or "").strip()}
+    site = {}
+    if isinstance(data, dict):
+        # Text fields (title/tagline/intro/About/credit + citation identity).
+        for k in ("title", "subtitle", "intro", "about", "credit", "author", "place"):
+            v = data.get(k)
+            if v is not None and str(v).strip():
+                site[k] = v
+        # Numeric opening-view fields (kept only when a real number; 0 is valid).
+        for k in ("start_lat", "start_lon", "start_zoom"):
+            v = data.get(k)
+            if isinstance(v, bool):
+                continue
+            if isinstance(v, (int, float)):
+                site[k] = v
+            elif isinstance(v, str) and v.strip():
+                try:
+                    site[k] = float(v)
+                except ValueError:
+                    pass
     body = ("/* settings.js: GENERATED from content/settings.yml by "
             "scripts/build_content.py. Do not edit by hand. */\n"
             "const SITE = " + json.dumps(site, ensure_ascii=False) + ";\n")
@@ -181,10 +229,14 @@ def main():
             v = fm.get(key)
             return v if v not in (None, "") else exif.get(key)
 
+        # Location priority: the map ("click to place") widget, then explicit
+        # lat/lon fields, then the photo's GPS.
+        loc_lat, loc_lon = parse_location(fm)
+
         entry = {
             "file": filename,
-            "lat": pick("lat"),
-            "lon": pick("lon"),
+            "lat": loc_lat if loc_lat is not None else pick("lat"),
+            "lon": loc_lon if loc_lon is not None else pick("lon"),
             "caption": fm.get("caption") or "",
             "source_ids": fm.get("sources") or [],
             "bearing": pick("bearing"),

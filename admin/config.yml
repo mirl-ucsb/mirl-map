@@ -29,7 +29,7 @@ public_folder: "/photos"
 collections:
   - name: "settings"
     label: "Map details"
-    description: "The name and words that frame your map: its title, tagline, the welcome paragraph on the opening screen, the About note, and the credit line. Edit these, save, and your map rebuilds and republishes on its own within a minute or two."
+    description: "The name and words that frame your map, who to credit in citations, and where the map opens. Edit these, save, and your map rebuilds and republishes on its own within a minute or two."
     delete: false
     files:
       - name: "details"
@@ -37,11 +37,16 @@ collections:
         file: "content/settings.yml"
         format: "yaml"
         fields:
-          - { name: "title",    label: "Title",    widget: "string", required: false, hint: "The big title on your map and the browser tab." }
+          - { name: "title",    label: "Title",    widget: "string", required: false, hint: "The big title on your map and the browser tab. Also the project name in citations." }
           - { name: "subtitle", label: "Tagline",  widget: "string", required: false, hint: "A short line under the title." }
           - { name: "intro",    label: "Welcome paragraph", widget: "text", required: false, hint: "A sentence or two on the opening screen, introducing the place or story." }
           - { name: "about",    label: "About note", widget: "text", required: false, hint: "A longer note about the project and who made it, shown in the About panel." }
           - { name: "credit",   label: "Credit line", widget: "string", required: false, hint: "Shown at the foot of the page, e.g. Photographs and text by Jane Doe." }
+          - { name: "author",   label: "Author for citations", widget: "string", required: false, hint: "The name credited in every 'cite this photograph' export, e.g. Jane Doe." }
+          - { name: "place",    label: "Place for citations",  widget: "string", required: false, hint: "Appended to citations, e.g. Santa Barbara, California. Leave blank to omit." }
+          - { name: "start_lat",  label: "Opening latitude",  widget: "number", required: false, value_type: "float", step: 0.000001, hint: "Optional. Leave blank to open on your photographs automatically." }
+          - { name: "start_lon",  label: "Opening longitude", widget: "number", required: false, value_type: "float", step: 0.000001, hint: "Optional. Pair with the latitude above." }
+          - { name: "start_zoom", label: "Opening zoom",      widget: "number", required: false, value_type: "int", hint: "Optional. 1 is the whole world, ~13 a town, ~16 a few streets." }
 
   - name: "photographs"
     label: "Photographs"
@@ -57,8 +62,9 @@ collections:
       - { name: "image",    label: "Photograph", widget: "image" }
       - { name: "caption",  label: "Caption",    widget: "string", hint: "One or two sentences shown under the photo." }
       - { name: "body",     label: "Narrative",  widget: "markdown", required: false, hint: "Optional. Cite sources with tokens like [SAMP]." }
-      - { name: "lat",      label: "Latitude",  widget: "number", required: false, value_type: "float", step: 0.000001, hint: "Auto-filled from the photo's GPS if blank." }
-      - { name: "lon",      label: "Longitude", widget: "number", required: false, value_type: "float", step: 0.000001, hint: "Auto-filled from the photo's GPS if blank." }
+      - { name: "location", label: "Location (click to place)", widget: "map", type: "Point", decimals: 6, required: false, hint: "Click the map to place this photograph. Leave blank to use the photo's own GPS, or type coordinates below." }
+      - { name: "lat",      label: "Latitude",  widget: "number", required: false, value_type: "float", step: 0.000001, hint: "Optional fallback. Used only if you have not placed it on the map above; auto-filled from the photo's GPS if blank." }
+      - { name: "lon",      label: "Longitude", widget: "number", required: false, value_type: "float", step: 0.000001, hint: "Optional fallback. Pair with the latitude above." }
       - { name: "bearing",  label: "Camera bearing",  widget: "number", required: false, value_type: "float", hint: "Auto-filled from EXIF. Degrees clockwise from north; draws the sightline cone." }
       - { name: "fov",      label: "Field of view",   widget: "number", required: false, value_type: "float", hint: "Auto-filled from EXIF (degrees)." }
       - { name: "taken_at", label: "Taken at",        widget: "string", required: false, hint: "Auto-filled from EXIF, e.g. 2026:05:01 14:10:00." }

@@ -537,6 +537,29 @@ var CITE_PROJECT_PLAIN = CONFIG.citation.projectPlain;
 var CITE_BASE_URL      = CONFIG.site.baseUrl;
 var CITE_PLACE         = CONFIG.citation.placeLabel || "";
 
+/* The "Map details" form (content/settings.yml, surfaced as SITE) overrides the
+   citation identity, so a non-technical editor gets correct citations without
+   touching js/config.js. From a single author name we derive the "Last, First"
+   (MLA/Chicago) and "Last, F." (APA) forms; the map's title becomes the cited
+   project name; place is appended to each citation. */
+function _nameForms(name) {
+  var parts = String(name || '').trim().split(/\s+/);
+  if (parts.length < 2) return { lastFirst: name, apa: name };
+  var last = parts[parts.length - 1], firsts = parts.slice(0, -1);
+  var initials = firsts.map(function (w) { return w.charAt(0).toUpperCase() + '.'; }).join(' ');
+  return { lastFirst: last + ', ' + firsts.join(' '), apa: last + ', ' + initials };
+}
+if (typeof SITE !== 'undefined' && SITE) {
+  if (SITE.author) {
+    CITE_AUTHOR = CITE_BIBTEX_AUTHOR = SITE.author;
+    var _nf = _nameForms(SITE.author);
+    CITE_AUTHOR_LASTF = _nf.lastFirst;
+    CITE_AUTHOR_APA   = _nf.apa;
+  }
+  if (SITE.title) { CITE_PROJECT = CITE_PROJECT_PLAIN = SITE.title; }
+  if (SITE.place) { CITE_PLACE = SITE.place; }
+}
+
 function _photoBase(file)   { return file.replace(/\.[^.]+$/, ''); }
 function _photoUrl(file)    { return CITE_BASE_URL + '?photo=' + _photoBase(file); }
 function _bibtexKey(file)   { return (CONFIG.citation.bibtexPrefix || 'photo') + '_' + _photoBase(file).toLowerCase().replace(/[^a-z0-9]/g, '_'); }
@@ -1224,10 +1247,15 @@ photoInfo.forEach(function(p, idx){
 
 map.addLayer(mcg);
 
-/* Open on the photographs: fit the view to their bounds (with a sensible zoom
-   cap so a single photo does not slam to max zoom). With no photographs, the
-   initial CONFIG.map.center / zoom set at map creation stands. */
-if (photoInfo.length) {
+/* Where the map opens. An explicit opening view from the "Map details" form wins;
+   otherwise fit the view to the photographs (with a zoom cap so a single photo does
+   not slam to max zoom); with no photographs and no set view, the initial
+   CONFIG.map.center / zoom stands. */
+var _startView = (typeof SITE !== 'undefined' && SITE) ? SITE : {};
+if (_startView.start_lat != null && _startView.start_lon != null) {
+  map.setView([_startView.start_lat, _startView.start_lon],
+              _startView.start_zoom != null ? _startView.start_zoom : map.getZoom());
+} else if (photoInfo.length) {
   try {
     map.fitBounds(L.latLngBounds(photoInfo.map(function (p) { return [p.lat, p.lon]; })),
                   { padding: [40, 40], maxZoom: 15 });
