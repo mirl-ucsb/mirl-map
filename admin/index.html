@@ -1,15 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex">
-  <title>MIRL Map: Content admin</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Your map dashboard</title>
+<meta name="theme-color" content="#1b2733">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='10' fill='%231b2733'/><circle cx='32' cy='27' r='9' fill='%23e9edf1'/><circle cx='32' cy='27' r='3.4' fill='%230f766e'/><path d='M32 36 L24 50 L40 50 Z' fill='%23e9edf1'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"/>
+<style>
+  :root{
+    --slate:#1b2733; --teal:#0f766e; --teal-d:#0c5d56; --teal-bg:#e1f0ec;
+    --ink:#1b2733; --ink2:#46566a; --ink3:#74859a;
+    --bg:#e9edf1; --panel:#f5f7f9; --line:#d3dae1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:26px 20px 52px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .logo{width:40px;height:40px;border-radius:9px;background:var(--slate);display:flex;align-items:center;justify-content:center;flex:none}
+  .brand .nm{font-family:'Space Grotesk',sans-serif;font-size:1.02rem;font-weight:600;line-height:1.15}
+  .brand .k{font-size:.7rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.14em}
+  .toplinks{font-size:.84rem;display:flex;gap:14px}
+  a.link{color:var(--teal);text-decoration:none}
+  a.link:hover{text-decoration:underline}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:18px}
+  .maptitle{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;margin:0 0 3px;letter-spacing:.2px}
+  .tagline{color:var(--ink2);margin:0}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;font-weight:600;padding:5px 12px;border-radius:999px;background:var(--teal-bg);color:var(--teal-d);white-space:nowrap}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--teal)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:22px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 16px}
+  .stat .n{font-family:'Space Grotesk',sans-serif;font-size:1.45rem;font-weight:600;line-height:1.1}
+  .stat .l{font-size:.8rem;color:var(--ink3);margin-top:2px}
+  .actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:11px;margin-bottom:22px}
+  .act{display:flex;align-items:center;gap:13px;padding:15px 17px;border-radius:11px;text-decoration:none;border:1px solid var(--line);background:#fff;color:var(--ink)}
+  .act:hover{border-color:#b9c4cf;background:#fbfcfd}
+  .act.primary{background:var(--teal);border-color:var(--teal);color:#eef3f7}
+  .act.primary:hover{background:var(--teal-d)}
+  .act .ic{flex:none;display:flex}
+  .act .tx{flex:1;min-width:0}
+  .act .t{font-weight:600;font-size:.97rem}
+  .act .s{font-size:.8rem;color:var(--ink3)}
+  .act.primary .s{color:#bfe0d8}
+  .act .ch{color:var(--ink3);flex:none}
+  .act.primary .ch{color:#bfe0d8}
+  .preview{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff;margin-bottom:18px}
+  .preview .bar{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--line);font-size:.83rem;color:var(--ink2)}
+  .preview iframe{display:block;width:100%;height:240px;border:0;background:var(--bg)}
+  .notes{font-size:.85rem;color:var(--ink3);margin:0}
+  .notes p{margin:0 0 5px;display:flex;align-items:flex-start;gap:8px}
+  .notes svg{flex:none;margin-top:2px}
+</style>
 </head>
 <body>
-  <!-- Sveltia CMS (a fast, drop-in Decap replacement), loaded from its CDN with no
-       build step. It reads config.yml in this folder and commits your edits to the
-       repo. See ADMIN-SETUP.md for the one-time GitHub login setup. -->
-  <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="logo">
+        <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="27" r="9" fill="#e9edf1"/><circle cx="32" cy="27" r="3.4" fill="#0f766e"/><path d="M32 36 L24 50 L40 50 Z" fill="#e9edf1"/></svg>
+      </div>
+      <div>
+        <div class="nm">MIRL Map</div>
+        <div class="k">Dashboard</div>
+      </div>
+    </div>
+    <div class="toplinks">
+      <a class="link" id="lnk-status" href="#" target="_blank" rel="noopener">Build status &#8599;</a>
+      <a class="link" id="lnk-repo" href="#" target="_blank" rel="noopener">On GitHub &#8599;</a>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <div class="head">
+      <div>
+        <h1 class="maptitle" id="m-title">Your map</h1>
+        <p class="tagline" id="m-tag">A documentary photo-map</p>
+      </div>
+      <span class="pill"><span class="dot"></span>Published</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="n" id="s-photos">&#8212;</div><div class="l">Photographs</div></div>
+      <div class="stat"><div class="n" id="s-updated">&#8212;</div><div class="l">Last updated</div></div>
+      <div class="stat"><div class="n" id="s-lang">English</div><div class="l">Map language</div></div>
+    </div>
+
+    <div class="actions">
+      <a class="act primary" href="edit/#/collections/photographs/new">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d6efe9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h2l1.2-2h7.6L18 7h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2"/><circle cx="12" cy="13" r="3.2"/><path d="M19 5.5v3M17.5 7h3"/></svg></span>
+        <span class="tx"><div class="t">Add a photograph</div><div class="s">Upload, caption, write</div></span>
+        <span class="ch">&#8250;</span>
+      </a>
+      <a class="act" href="edit/#/collections/photographs">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#74859a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15l5-4 4 3 3-2 6 5"/><circle cx="9" cy="9" r="1.4"/></svg></span>
+        <span class="tx"><div class="t">Manage photographs</div><div class="s">Edit, reorder, remove</div></span>
+        <span class="ch">&#8250;</span>
+      </a>
+      <a class="act" href="edit/#/collections/settings">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#74859a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M4 12h16M4 17h7"/><circle cx="17" cy="7" r="2.2"/><circle cx="14" cy="17" r="2.2"/></svg></span>
+        <span class="tx"><div class="t">Edit map details</div><div class="s">Title, intro, About, credit</div></span>
+        <span class="ch">&#8250;</span>
+      </a>
+      <a class="act" href="../" target="_blank" rel="noopener">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#74859a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4z"/><path d="M9 4v13M15 6.5v13"/></svg></span>
+        <span class="tx"><div class="t">View your map</div><div class="s">Open the live site</div></span>
+        <span class="ch">&#8599;</span>
+      </a>
+    </div>
+
+    <div class="preview">
+      <div class="bar"><span>Live preview</span><a class="link" href="../" target="_blank" rel="noopener">Open &#8599;</a></div>
+      <iframe id="pv" src="../" loading="lazy" title="Live preview of your map"></iframe>
+    </div>
+
+    <div class="notes">
+      <p><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#74859a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg> Every change you save rebuilds and republishes your map on its own, usually within a minute.</p>
+      <p><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#74859a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> You sign in with GitHub the first time you open the editor.</p>
+    </div>
+
+  </div>
+</div>
+
+<script src="../js/data/settings.js" onerror="void 0"></script>
+<script src="../js/data/photos.js" onerror="void 0"></script>
+<script>
+(function () {
+  function $(id) { return document.getElementById(id); }
+
+  // Map identity from the generated settings (falls back to the defaults above).
+  try {
+    if (typeof SITE !== 'undefined' && SITE) {
+      if (SITE.title)    { $('m-title').textContent = SITE.title; document.title = SITE.title + ' · dashboard'; }
+      if (SITE.subtitle) { $('m-tag').textContent = SITE.subtitle; }
+    }
+  } catch (e) {}
+
+  // Photograph count.
+  try {
+    if (typeof photoInfo !== 'undefined' && photoInfo) { $('s-photos').textContent = photoInfo.length; }
+  } catch (e) {}
+
+  // Owner/repo from the Pages URL (owner.github.io/repo/admin/), for the GitHub links.
+  var host = location.hostname, segs = location.pathname.split('/').filter(Boolean);
+  if (/\.github\.io$/.test(host) && segs.length) {
+    var owner = host.replace(/\.github\.io$/, ''), repo = segs[0];
+    $('lnk-status').href = 'https://github.com/' + owner + '/' + repo + '/actions';
+    $('lnk-repo').href   = 'https://github.com/' + owner + '/' + repo;
+  } else {
+    $('lnk-status').style.display = 'none';
+    $('lnk-repo').style.display = 'none';
+  }
+
+  // "Last updated" from the deployed file's Last-Modified header (same origin).
+  fetch('../js/data/photos.js', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
+    var lm = r.headers.get('last-modified'); if (!lm) return;
+    var secs = (Date.now() - new Date(lm).getTime()) / 1000, out;
+    if (secs < 90)        out = 'just now';
+    else if (secs < 3600) out = Math.round(secs / 60) + ' min ago';
+    else if (secs < 86400) out = Math.round(secs / 3600) + ' hr ago';
+    else                  out = Math.round(secs / 86400) + ' d ago';
+    $('s-updated').textContent = out;
+  }).catch(function () {});
+})();
+</script>
 </body>
 </html>
