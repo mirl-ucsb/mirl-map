@@ -41,11 +41,15 @@
 <script src="js/config.js?v=8"></script>
 <script src="js/data/settings.js?v=8"></script>
 <script>
-  /* Skip the intro overlay when arriving via permalink (?photo=…) so shared
-     links go straight to the photo. Done in <head> to avoid a flash. */
-  if (new URLSearchParams(location.search).get('photo')) {
-    document.documentElement.classList.add('intro-skip');
-  }
+  /* Skip the intro overlay when arriving via a photo permalink (?photo=…) or in
+     preview mode (?preview, used by the dashboard's live preview) so the map shows
+     at once instead of the splash. Done in <head> to avoid a flash. */
+  (function () {
+    var q = new URLSearchParams(location.search);
+    if (q.get('photo') || q.has('preview')) {
+      document.documentElement.classList.add('intro-skip');
+    }
+  })();
   /* Apply the saved interface language/direction before paint, so a visitor in
      a right-to-left second language never sees a left-to-right flash. */
   try {
