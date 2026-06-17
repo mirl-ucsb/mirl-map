@@ -157,9 +157,8 @@ released under the MIT License. You are free to use it, fork it, and adapt it fo
 your own projects. The full text is in [LICENSE](LICENSE).
 
 The license covers the platform, not what you put into it. Your photographs and your
-writing stay entirely yours, to license however you wish. The template ships with a
-single placeholder example, there to show the format and meant to be replaced with
-your own.
+writing stay entirely yours, to license however you wish. A new map starts empty, ready
+for your first photograph.
 
 MIRL Map bundles one third-party component, leaflet-side-by-side (MIT), by Digital
 Democracy.

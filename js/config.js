@@ -40,7 +40,7 @@ const CONFIG = {
 
     // Social-preview + SEO. These also live as <meta> tags in index.html and
     // gallery.html, which is what social/link crawlers actually read.
-    ogImage:      "photos/web/example.jpeg",        // EDIT ME: 1200x630-ish hero image
+    ogImage:      "",                               // EDIT ME: a social-preview image once you have one, e.g. "photos/web/your-photo.jpeg"
     description:  "A documentary photo-map: geolocated photographs paired with per-photo narratives.",
     keywords:     "documentary, photo map, photographs, archive"
   },

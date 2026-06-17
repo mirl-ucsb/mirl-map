@@ -5,8 +5,8 @@ If you enable a second language in `js/config.js`
 translated narratives in this folder, named the same as the English file:
 
 ```
-narratives/example.md        (default language)
-narratives/ar/example.md     (second language)
+narratives/old-pier.md        (default language)
+narratives/ar/old-pier.md     (second language)
 ```
 
 This folder is named `ar/` only as the shipped example. If your second language

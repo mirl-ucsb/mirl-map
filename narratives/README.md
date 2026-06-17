@@ -4,7 +4,7 @@ One Markdown file per photograph holds its written narrative. The filename is
 the photo's filename without its extension:
 
 ```
-photos/example.jpeg   →   narratives/example.md
+photos/old-pier.jpeg   →   narratives/old-pier.md
 ```
 
 Photographs without a file here simply show their caption; narratives are
