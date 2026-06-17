@@ -71,10 +71,10 @@ photoInfo.forEach(function(p, idx) {
 
   entry.innerHTML =
     '<div class="g-photo-wrap" onclick="openLb(' + idx + ')">' +
-      '<img src="' + CONFIG.images.web + p.file + '" alt="' + p.caption.replace(/"/g, '&quot;') + '" loading="lazy">' +
+      '<img src="' + CONFIG.images.web + p.file + '" alt="' + escapeHtml(p.caption || '').replace(/"/g, '&quot;') + '" loading="lazy">' +
       '<span class="g-photo-num">' + (idx + 1) + ' / ' + photoInfo.length + '</span>' +
     '</div>' +
-    '<div class="g-caption">' + p.caption + '</div>' +
+    '<div class="g-caption">' + escapeHtml(p.caption || '') + '</div>' +
     (p.lat ? '<div class="g-coords">' + fmtCoords(p.lat, p.lon) + ' &nbsp;&middot;&nbsp; ' + p.file + '</div>' : '') +
     '<div class="g-context"></div>' +
     buildSources(p.source_ids);

@@ -15,8 +15,9 @@ It was built for people in the **arts, humanities, and cultural heritage**:
 curators, archivists, scholars, artists, librarians, and community historians.
 **You do not need to know how to code to use it.**
 
-The project comes with a small sample map already filled in, so you can see how
-everything works before you add anything of your own.
+A new map starts empty, ready for your first photograph. To see a finished one,
+the [live example](https://mirl-ucsb.github.io/mirl-map-example/) is a short
+documentary walk along the UC Santa Barbara coast.
 
 ---
 

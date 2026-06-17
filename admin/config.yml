@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------
 # This powers the /admin editor. Editors log in with GitHub and add/edit
 # photographs, captions, and narratives; their changes are committed to the
-# repo, and a GitHub Action (.github/workflows/build-content.yml) regenerates
+# repo, and a GitHub Action (.github/workflows/static.yml) regenerates
 # js/data/photos.js, the narratives, and the web/thumb tiers.
 #
 # The "Log in with GitHub" sign-in is handled by MIRL's shared login helper

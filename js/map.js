@@ -1229,7 +1229,7 @@ photoInfo.forEach(function(p, idx){
   var mk = L.marker([p.lat, p.lon], {icon: ic});
   mk.bindPopup(
     '<img class="popup-img" src="' + CONFIG.images.web + p.file + '" data-idx="' + idx + '">' +
-    '<div class="popup-caption">' + p.caption + '</div>' +
+    '<div class="popup-caption">' + escapeHtmlSafe(p.caption || '') + '</div>' +
     '<div class="popup-coords">' + p.file + ' · ' + fmtCoords(p.lat, p.lon) + '</div>' +
     '<div class="popup-footer">' +
       '<button class="popup-btn popup-btn-full" data-idx="' + idx + '">Full size ↗</button>' +
