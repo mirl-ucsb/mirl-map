@@ -29,6 +29,11 @@ body { background: #e9edf1; }
   max-width: 640px;
 }
 
+/* Empty gallery (no photographs yet) */
+.g-empty { color: #46566a; font-size: 1.02rem; padding: 8px 0 40px; }
+.g-empty a { color: #0c5d56; font-weight: 600; text-decoration: none; }
+.g-empty a:hover { text-decoration: underline; }
+
 /* Each photo entry */
 .g-entry {
   margin-bottom: 72px;

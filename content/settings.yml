@@ -6,6 +6,9 @@ intro: "Welcome to your map. Replace this with a sentence or two about the place
 about: "A short note about this project and who made it. You can edit it in the Map details form."
 credit: "Photographs and text by you."
 
+# Social-preview image shown when your map is shared in a link. Optional.
+cover: ""
+
 # Citation identity, used by the "cite this photograph" export. Optional.
 author: ""        # the name credited in every citation, e.g. Jane Doe
 place: ""         # appended to citations, e.g. Santa Barbara, California

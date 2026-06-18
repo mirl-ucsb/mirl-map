@@ -42,6 +42,7 @@ collections:
           - { name: "intro",    label: "Welcome paragraph", widget: "text", required: false, hint: "A sentence or two on the opening screen, introducing the place or story." }
           - { name: "about",    label: "About note", widget: "text", required: false, hint: "A longer note about the project and who made it, shown in the About panel." }
           - { name: "credit",   label: "Credit line", widget: "string", required: false, hint: "Shown at the foot of the page, e.g. Photographs and text by Jane Doe." }
+          - { name: "cover",    label: "Social-preview image", widget: "image", required: false, hint: "Shown when a link to your map is shared. A wide photograph works best. Leave blank for none." }
           - { name: "author",   label: "Author for citations", widget: "string", required: false, hint: "The name credited in every 'cite this photograph' export, e.g. Jane Doe." }
           - { name: "place",    label: "Place for citations",  widget: "string", required: false, hint: "Appended to citations, e.g. Santa Barbara, California. Leave blank to omit." }
           - { name: "start_lat",  label: "Opening latitude",  widget: "number", required: false, value_type: "float", step: 0.000001, hint: "Optional. Leave blank to open on your photographs automatically." }
@@ -61,6 +62,7 @@ collections:
     fields:
       - { name: "image",    label: "Photograph", widget: "image" }
       - { name: "caption",  label: "Caption",    widget: "string", hint: "One or two sentences shown under the photo." }
+      - { name: "order",    label: "Order",      widget: "number", required: false, value_type: "int", hint: "Optional. A number to sequence the photo essay (1, 2, 3 ...). Photos without one keep their file order." }
       - { name: "body",     label: "Narrative",  widget: "markdown", required: false, hint: "Optional. Cite sources with tokens like [SAMP]." }
       - { name: "location", label: "Location (click to place)", widget: "map", type: "Point", decimals: 6, required: false, hint: "Click the map to place this photograph. Leave blank to use the photo's own GPS, or type coordinates below." }
       - { name: "lat",      label: "Latitude",  widget: "number", required: false, value_type: "float", step: 0.000001, hint: "Optional fallback. Used only if you have not placed it on the map above; auto-filled from the photo's GPS if blank." }

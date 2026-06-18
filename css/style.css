@@ -158,6 +158,17 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 500; }
 #intro-screen.is-gone    { display: none; }
 html.intro-skip #intro-screen { display: none !important; }
 
+/* Empty-state: shown over the map only when there are no photographs yet. */
+#empty-state { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 600; pointer-events: none; }
+#empty-state .es-card { pointer-events: auto; background: #ffffff; border: 1px solid #d3dae1; border-radius: 14px; padding: 30px 34px; text-align: center; box-shadow: 0 12px 44px rgba(27,39,51,.18); max-width: 380px; margin: 0 18px; }
+#empty-state .es-h { font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 600; font-size: 1.45rem; color: #1b2733; margin-bottom: 8px; }
+#empty-state .es-p { color: #46566a; margin: 0 0 20px; font-size: 1rem; }
+#empty-state .es-btn { display: inline-block; background: #0f766e; color: #eef3f7; text-decoration: none; font-weight: 600; padding: 11px 22px; border-radius: 8px; }
+#empty-state .es-btn:hover { background: #0c5d56; }
+.about-edit { margin-top: 14px; }
+.about-edit a { color: #0f766e; font-weight: 600; text-decoration: none; font-size: .92rem; }
+.about-edit a:hover { text-decoration: underline; }
+
 .intro-card {
   max-width: 720px;
   width: 100%;

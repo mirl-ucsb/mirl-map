@@ -64,6 +64,15 @@ document.getElementById('lb').addEventListener('click', function(e) {
 // Build the gallery
 var grid = document.getElementById('gallery-grid');
 
+// No photographs yet: a friendly note instead of an empty page.
+if (!photoInfo.length) {
+  var msg = document.createElement('p');
+  msg.className = 'g-empty';
+  msg.innerHTML = 'No photographs yet. ' +
+    '<a href="admin/">Add your first photograph from the dashboard &rarr;</a>';
+  grid.appendChild(msg);
+}
+
 photoInfo.forEach(function(p, idx) {
   var entry = document.createElement('div');
   entry.className = 'g-entry';

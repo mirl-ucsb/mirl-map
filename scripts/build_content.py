@@ -211,9 +211,58 @@ def build_settings():
         f.write(body)
     print(f"  settings   js/data/settings.js ({len(site)} field(s))")
 
+# ── Social-preview cover image (content/settings.yml "cover" → og:image) ────────
+def site_base_url():
+    """Best guess at the map's public web address, for absolute social-image URLs."""
+    gr = os.environ.get("GITHUB_REPOSITORY")          # "owner/repo", set in CI
+    if gr and "/" in gr:
+        owner, repo = gr.split("/", 1)
+        return f"https://{owner.lower()}.github.io/{repo}/"
+    try:
+        cfg = open(os.path.join(REPO, "js", "config.js"), encoding="utf-8").read()
+        m = re.search(r'baseUrl:\s*"([^"]+)"', cfg)
+        if m and "YOUR-USER" not in m.group(1):
+            return m.group(1)
+    except Exception:
+        pass
+    return ""
+
+def apply_cover():
+    """Write the social-preview image chosen in the Map details form into the
+    og:image / twitter:image tags of index.html and gallery.html, between the
+    <!-- MIRL:OG-START --> ... <!-- MIRL:OG-END --> markers. No cover clears them."""
+    cover = ""
+    if os.path.exists(SETTINGS_YML):
+        try:
+            data = yaml.safe_load(open(SETTINGS_YML, encoding="utf-8")) or {}
+            if isinstance(data, dict):
+                cover = str(data.get("cover") or "").strip()
+        except Exception:
+            cover = ""
+    tags = ""
+    if cover:
+        fn = os.path.basename(cover)
+        ensure_tiers(fn)                              # make the web copy if needed
+        base = site_base_url()
+        url = (base + "photos/web/" + fn) if base else ("photos/web/" + fn)
+        tags = (f'<meta property="og:image" content="{url}">'
+                f'<meta name="twitter:image" content="{url}">')
+        print(f"  cover      social image -> {url}")
+    pat = re.compile(r'(<!-- MIRL:OG-START -->).*?(<!-- MIRL:OG-END -->)', re.S)
+    for name in ("index.html", "gallery.html"):
+        path = os.path.join(REPO, name)
+        if not os.path.exists(path):
+            continue
+        html = open(path, encoding="utf-8").read()
+        new = pat.sub(lambda m: m.group(1) + tags + m.group(2), html)
+        if new != html:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(new)
+
 # ── Main ────────────────────────────────────────────────────────────────────
 def main():
     build_settings()
+    apply_cover()
     if not os.path.isdir(CONTENT_DIR):
         print(f"No {CONTENT_DIR}: nothing to build (the template's hand-edited "
               f"photos.js is left untouched).")
@@ -249,6 +298,7 @@ def main():
             "bearing": pick("bearing"),
             "fov": pick("fov"),
             "taken_at": pick("taken_at"),
+            "order": fm.get("order"),   # optional manual sequence; see the sort below
         }
         if entry["lat"] is None or entry["lon"] is None:
             print(f"  no location for {filename} "
@@ -276,6 +326,15 @@ def main():
         if base not in keep_narratives and os.path.exists(p):
             os.remove(p)
             print(f"  removed narratives/{base}.md (empty narrative)")
+
+    # Sequence the photographs: by the manual "order" when set, then by filename.
+    # Photographs with an order lead (in that order); the rest keep filename order,
+    # which is the default for maps that do not bother sequencing.
+    def _order_key(e):
+        o = e.get("order")
+        o = o if isinstance(o, (int, float)) and not isinstance(o, bool) else 10**9
+        return (o, e["file"])
+    entries.sort(key=_order_key)
 
     with open(PHOTOS_JS, "w", encoding="utf-8") as out:
         out.write(emit_photos_js(entries, unplaced))

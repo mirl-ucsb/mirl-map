@@ -1268,6 +1268,12 @@ if (_startView.start_lat != null && _startView.start_lon != null) {
   } catch (e) {}
 }
 
+/* No photographs yet: show the "add your first photograph" card over the map. */
+if (!photoInfo.length) {
+  var _es = document.getElementById('empty-state');
+  if (_es) _es.style.display = 'flex';
+}
+
 /* ── Feature flags ─────────────────────────────────────────
    Hide any element tagged data-feature="X" whose CONFIG.features.X is false,
    and the language toggle when there is no second language. This is what makes
