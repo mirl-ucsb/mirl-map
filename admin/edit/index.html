@@ -5,44 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <title>MIRL Map editor</title>
-  <!-- Sveltia reads this to find the shared config one folder up (see the dashboard
-       at /admin/). The script below loads Sveltia only once it confirms this copy is
-       a real map, not the unconfigured template. -->
-  <link href="../config.yml" type="text/yaml" rel="cms-config-url">
   <meta name="theme-color" content="#1b2733">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
 </head>
 <body>
   <div id="not-a-map" style="display:none;max-width:520px;margin:12vh auto;padding:0 24px;text-align:center;font-family:'Inter',system-ui,sans-serif;color:#1b2733;line-height:1.6">
     <h1 style="font-family:'Space Grotesk',system-ui,sans-serif;color:#0f766e;font-size:1.6rem;margin:0 0 10px">This is the MIRL Map template</h1>
-    <p style="color:#46566a">You have opened the template's own editor, which is not connected to a real map, so signing in cannot save anywhere. That is what the "no access" error means.</p>
+    <p style="color:#46566a">You have opened the template's own editor, which is not connected to a real map, so signing in cannot save anywhere.</p>
     <p style="margin-top:22px"><a href="https://mirl-ucsb.github.io/mirl-map-landing/" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#0f766e;color:#eef3f7;text-decoration:none;font-weight:600">Create your own map &rarr;</a></p>
     <p style="color:#74859a;font-size:.92rem;margin-top:18px">Already have a map? Open <code>your-name.github.io/your-map/admin/</code> and edit from there.</p>
   </div>
   <script>
-    /* Load the editor only for a real map. A copy still carrying the template's
-       placeholder repository (YOUR-USER/...) cannot be edited, so instead of letting
-       the CMS fail its GitHub sign-in with a confusing "no access" message, we explain
-       what happened. */
+    /* Which repository does this editor save to? We trust the address the map is served
+       from, your-name.github.io/your-map/, over the repo name written in the config
+       file, so a real map still works even if the one-time step that stamps the config
+       with its repository did not run. We load the config, point it at the resolved
+       repository, and start the CMS by hand. The template itself shows the note above. */
+    window.CMS_MANUAL_INIT = true;
     (function () {
-      function loadCMS() {
-        var s = document.createElement('script');
-        s.src = 'https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js';
-        document.body.appendChild(s);
-      }
+      function notAMap() { document.getElementById('not-a-map').style.display = 'block'; }
+
+      var host = location.hostname, segs = location.pathname.split('/').filter(Boolean);
+      var urlRepo = (/\.github\.io$/i.test(host) && segs.length)
+        ? host.replace(/\.github\.io$/i, '') + '/' + segs[0] : '';
+      if (urlRepo.toLowerCase() === 'mirl-ucsb/mirl-map') { notAMap(); return; }   // the template
+
       fetch('../config.yml', { cache: 'no-store' })
         .then(function (r) { return r.text(); })
-        .then(function (yml) {
-          var m = yml.match(/^\s*repo:\s*([^\s#]+)/m);
-          var repo = m ? m[1] : '';
-          if (!repo || /YOUR-USER/i.test(repo)) {
-            document.getElementById('not-a-map').style.display = 'block';
-          } else {
-            loadCMS();
+        .then(function (text) {
+          var cfg = null;
+          try { cfg = window.jsyaml.load(text); } catch (e) { cfg = null; }
+          if (!cfg || !cfg.backend) { notAMap(); return; }
+          // Prefer the serving address; fall back to the config file (local previews,
+          // custom domains).
+          var repo = urlRepo || cfg.backend.repo || '';
+          if (!repo || /YOUR-USER/i.test(repo) || repo.toLowerCase() === 'mirl-ucsb/mirl-map') {
+            notAMap(); return;
           }
+          cfg.backend.repo = repo;
+          cfg.load_config_file = false;
+          var s = document.createElement('script');
+          s.src = 'https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js';
+          s.onload = function () { try { window.CMS.init({ config: cfg }); } catch (e) {} };
+          document.body.appendChild(s);
         })
-        .catch(loadCMS);   // if the config can't be read, fall back to loading the CMS
+        .catch(notAMap);
     })();
   </script>
 </body>

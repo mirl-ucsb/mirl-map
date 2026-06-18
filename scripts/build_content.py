@@ -131,7 +131,7 @@ def parse_location(fm):
     return (None, None)
 
 # ── photos.js emitter (readable, one entry per block) ───────────────────────
-def emit_photos_js(entries):
+def emit_photos_js(entries, unplaced=None):
     blocks = []
     for e in entries:
         lines = ['    "file": ' + json.dumps(e["file"]),
@@ -146,7 +146,12 @@ def emit_photos_js(entries):
         if e.get("taken_at"):
             lines.append('    "taken_at": ' + json.dumps(e["taken_at"]))
         blocks.append("  {\n" + ",\n".join(lines) + "\n  }")
-    return HEADER + "const photoInfo = [\n" + ",\n".join(blocks) + "\n];\n"
+    out = HEADER + "const photoInfo = [\n" + ",\n".join(blocks) + "\n];\n"
+    # Photographs that were added but have no location, so they are not on the map.
+    # The dashboard reads this to tell the editor which ones still need placing.
+    up = [{"file": u["file"], "caption": u.get("caption", "")} for u in (unplaced or [])]
+    out += "\nconst photoInfoUnplaced = " + json.dumps(up, ensure_ascii=False) + ";\n"
+    return out
 
 # ── Tier generation (mirror make_thumbs.py) ─────────────────────────────────
 def ensure_tiers(filename):
@@ -216,6 +221,7 @@ def main():
 
     files = sorted(glob.glob(os.path.join(CONTENT_DIR, "*.md")))
     entries = []
+    unplaced = []
     keep_narratives = set()
 
     for f in files:
@@ -245,8 +251,9 @@ def main():
             "taken_at": pick("taken_at"),
         }
         if entry["lat"] is None or entry["lon"] is None:
-            print(f"  WARNING: no coordinates for {filename} "
-                  f"(no lat/lon in frontmatter and none in EXIF). Skipping.")
+            print(f"  no location for {filename} "
+                  f"(no GPS, and none placed or typed); left off the map for now.")
+            unplaced.append({"file": filename, "caption": entry["caption"]})
             continue
         entries.append(entry)
         ensure_tiers(filename)
@@ -271,8 +278,12 @@ def main():
             print(f"  removed narratives/{base}.md (empty narrative)")
 
     with open(PHOTOS_JS, "w", encoding="utf-8") as out:
-        out.write(emit_photos_js(entries))
-    print(f"\nWrote js/data/photos.js with {len(entries)} photograph(s).")
+        out.write(emit_photos_js(entries, unplaced))
+    msg = f"\nWrote js/data/photos.js with {len(entries)} photograph(s)"
+    if unplaced:
+        verb = "needs" if len(unplaced) == 1 else "need"
+        msg += f" ({len(unplaced)} still {verb} a location)"
+    print(msg + ".")
 
 
 if __name__ == "__main__":

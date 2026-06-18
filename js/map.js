@@ -535,6 +535,12 @@ var CITE_BIBTEX_AUTHOR = CONFIG.site.author;
 var CITE_PROJECT       = CONFIG.citation.project;
 var CITE_PROJECT_PLAIN = CONFIG.citation.projectPlain;
 var CITE_BASE_URL      = CONFIG.site.baseUrl;
+/* If the public address was never filled in (a map whose config was not stamped
+   with its repository), fall back to the address this page is served from, so
+   citation permalinks point at the live map rather than a placeholder. */
+if (/YOUR-USER/i.test(CITE_BASE_URL) || !CITE_BASE_URL) {
+  CITE_BASE_URL = location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
+}
 var CITE_PLACE         = CONFIG.citation.placeLabel || "";
 
 /* The "Map details" form (content/settings.yml, surfaced as SITE) overrides the

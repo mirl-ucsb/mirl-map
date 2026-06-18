@@ -7,3 +7,5 @@
 const photoInfo = [
 
 ];
+
+const photoInfoUnplaced = [];

@@ -49,6 +49,10 @@
   .act.primary .s{color:#bfe0d8}
   .act .ch{color:var(--ink3);flex:none}
   .act.primary .ch{color:#bfe0d8}
+  .needloc{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fdf4e3;border:1px solid #f0dba8;color:#7a5413;border-radius:10px;padding:11px 15px;margin-bottom:22px;font-size:.9rem}
+  .needloc svg{flex:none}
+  .needloc a{color:#0c5d56;font-weight:600;text-decoration:none;margin-left:auto}
+  .needloc a:hover{text-decoration:underline}
   .bulk{font-size:.86rem;color:var(--ink3);margin:0 0 18px}
   .bulk a{color:var(--teal2);text-decoration:none}
   .bulk a:hover{text-decoration:underline}
@@ -93,6 +97,12 @@
       <div class="stat"><div class="n" id="s-photos">&#8212;</div><div class="l">Photographs</div></div>
       <div class="stat"><div class="n" id="s-updated">&#8212;</div><div class="l">Last updated</div></div>
       <div class="stat"><div class="n" id="s-lang">English</div><div class="l">Map language</div></div>
+    </div>
+
+    <div class="needloc" id="needloc" style="display:none">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9a6a12" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+      <span id="needloc-txt"></span>
+      <a id="needloc-link" href="edit/#/collections/photographs">Add a location &#8599;</a>
     </div>
 
     <div class="actions">
@@ -150,6 +160,16 @@
   // Photograph count.
   try {
     if (typeof photoInfo !== 'undefined' && photoInfo) { $('s-photos').textContent = photoInfo.length; }
+  } catch (e) {}
+
+  // Photographs added but not yet on the map, because they have no location.
+  try {
+    if (typeof photoInfoUnplaced !== 'undefined' && photoInfoUnplaced && photoInfoUnplaced.length) {
+      var n = photoInfoUnplaced.length;
+      $('needloc-txt').textContent = n + (n === 1 ? ' photograph needs' : ' photographs need') +
+        ' a location to appear on the map.';
+      $('needloc').style.display = 'flex';
+    }
   } catch (e) {}
 
   // Owner/repo from the Pages URL (owner.github.io/repo/admin/), for the GitHub links.
