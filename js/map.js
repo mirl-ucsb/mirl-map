@@ -1268,10 +1268,19 @@ if (_startView.start_lat != null && _startView.start_lon != null) {
   } catch (e) {}
 }
 
-/* No photographs yet: show the "add your first photograph" card over the map. */
+/* No photographs yet: show the "add your first photograph" card over the map,
+   and swap the intro splash's how-to-read tip (which teaches clicking photos,
+   the arrow keys, and Wander) for a start-here note, since none of that does
+   anything until the map has photographs. */
 if (!photoInfo.length) {
   var _es = document.getElementById('empty-state');
   if (_es) _es.style.display = 'flex';
+  var _tip = document.querySelector('#intro-screen [data-i18n-html="intro.tip"]');
+  if (_tip) {
+    _tip.innerHTML = 'No photographs yet. Open the <a href="admin/">dashboard</a> ' +
+                     'to add your first one, and it will appear here on the map.';
+    _tip._i18nHTML = _tip.innerHTML;   // keep it through any later i18n re-apply
+  }
 }
 
 /* Status-bar count: "N photograph(s)". The number is owned here, not the i18n
