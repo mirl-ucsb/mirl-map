@@ -75,7 +75,6 @@ var siteI18N = {
   /* Photo drawer */
   "drawer.prev":     { en: "← Prev" },
   "drawer.next":     { en: "Next →" },
-  "status.count":    { en: "photographs &nbsp;&middot;&nbsp; About &#9432;" },
   "cite.title":      { en: "Cite this photograph" },
 
   /* Intro splash */

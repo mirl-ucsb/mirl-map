@@ -1274,6 +1274,16 @@ if (!photoInfo.length) {
   if (_es) _es.style.display = 'flex';
 }
 
+/* Status-bar count: "N photograph(s)". The number is owned here, not the i18n
+   string, so it tracks the real photo count and pluralizes. */
+(function () {
+  var _pc = document.getElementById('photo-count-n');
+  if (_pc) {
+    var _n = photoInfo.length;
+    _pc.textContent = _n + (_n === 1 ? ' photograph' : ' photographs');
+  }
+})();
+
 /* ── Feature flags ─────────────────────────────────────────
    Hide any element tagged data-feature="X" whose CONFIG.features.X is false,
    and the language toggle when there is no second language. This is what makes
