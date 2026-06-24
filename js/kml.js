@@ -17,6 +17,9 @@
   // Project URL + attribution come from CONFIG so the KML stays self-describing
   // once exported (the permalinks remain valid even if the file is shared).
   var PROJECT_URL = (typeof CONFIG !== 'undefined' && CONFIG.site.baseUrl) || '';
+  if (!PROJECT_URL || /YOUR-USER/i.test(PROJECT_URL)) {
+    PROJECT_URL = location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
+  }
   var ATTRIBUTION = (typeof CONFIG !== 'undefined' && CONFIG.kml && CONFIG.kml.attribution) || '';
 
   function escapeXml(s) {

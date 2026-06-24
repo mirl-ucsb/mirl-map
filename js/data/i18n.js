@@ -86,6 +86,11 @@ var siteI18N = {
   "intro.essay":     { en: "View as photo essay" },
   "intro.credit":    { en: "EDIT ME — your credit line." },
 
+  /* Empty state (a map with no photographs yet) */
+  "empty.h":         { en: "No photographs yet" },
+  "empty.p":         { en: "This map is waiting for its first photograph." },
+  "empty.btn":       { en: "Add your first photograph →" },
+
   /* Gallery page */
   "g.sub":           { en: "Photographs" },
   "g.intro.h2":      { en: "MIRL Map" },
