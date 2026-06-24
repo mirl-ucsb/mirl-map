@@ -287,3 +287,17 @@ body { background: #e9edf1; }
 html.hc #scrolly-voice{ background: #fff; border-color: #1a3038; border-left-color: #1a3038; }
 html.hc #scrolly-voice blockquote{ color: #000; }
 html.hc #scrolly-voice .sv-who{ color: #11181f; }
+
+/* Print / save-as-PDF: just the essay, photographs and narrative, on white. */
+@media print {
+  #header, #header-controls, #scrolly, #a11y-panel, #lightbox, .g-photo-num,
+  #btn-print, #btn-a11y, .nav-back, [data-lang-toggle] { display: none !important; }
+  html, body { background: #fff !important; color: #111 !important; }
+  #gallery, #gallery-grid { margin: 0 !important; }
+  .g-entry { page-break-inside: avoid; break-inside: avoid; border: none !important;
+    padding: 0 0 18px !important; margin: 0 0 18px !important; }
+  .g-photo-wrap { cursor: default !important; }
+  .g-entry img { max-width: 100% !important; max-height: 7.5in; object-fit: contain; }
+  .g-caption, .g-context, .g-coords, .caption-2 { color: #1a1a1a !important; }
+  a[href]:after { content: '' !important; }
+}

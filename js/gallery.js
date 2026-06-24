@@ -64,6 +64,20 @@ document.getElementById('lb').addEventListener('click', function(e) {
 // Build the gallery
 var grid = document.getElementById('gallery-grid');
 
+/* Print or save the whole essay as a PDF: the photographs lazy-load while
+   scrolling, so load them all first, then hand off to the browser's print. */
+function printEssay() {
+  var imgs = Array.prototype.slice.call(grid.querySelectorAll('img'));
+  imgs.forEach(function (im) { im.loading = 'eager'; });
+  var waits = imgs.filter(function (im) { return !im.complete; }).map(function (im) {
+    return new Promise(function (res) {
+      im.addEventListener('load', res, { once: true });
+      im.addEventListener('error', res, { once: true });
+    });
+  });
+  Promise.all(waits).then(function () { setTimeout(function () { window.print(); }, 200); });
+}
+
 // No photographs yet: a friendly note instead of an empty page.
 if (!photoInfo.length) {
   var msg = document.createElement('p');
