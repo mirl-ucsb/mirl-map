@@ -175,6 +175,69 @@ def ensure_tiers(filename):
                quality=q, optimize=True, progressive=True)
         print(f"  tier  photos/{name}/{filename}")
 
+# ── EXIF / GPS scrubbing for the published originals ─────────────────────────
+def load_strip_exif():
+    """Whether to strip EXIF/GPS from the published photographs (settings.yml
+    strip_exif, default on). The map keeps each photo's place in its own data,
+    so removing the embedded GPS never moves a marker."""
+    if not os.path.exists(SETTINGS_YML):
+        return True
+    try:
+        data = yaml.safe_load(open(SETTINGS_YML, encoding="utf-8")) or {}
+    except Exception:
+        return True
+    v = data.get("strip_exif", True)
+    if isinstance(v, str):
+        return v.strip().lower() not in ("false", "no", "0", "off", "")
+    return bool(v)
+
+def strip_image_exif(filename):
+    """Re-save photos/<filename> with no EXIF (GPS, camera, timestamps), baking
+    the orientation in so it still shows upright. Files already clean are left
+    untouched, so a rebuild does not churn them. Returns True if it rewrote."""
+    path = os.path.join(PHOTOS_DIR, filename)
+    if not os.path.exists(path):
+        return False
+    try:
+        im = Image.open(path)
+    except Exception:
+        return False
+    has_meta = bool(im.info.get("exif"))
+    try:
+        has_meta = has_meta or bool(im._getexif())
+    except Exception:
+        pass
+    if not has_meta:
+        return False
+    fixed = ImageOps.exif_transpose(im)
+    low = path.lower()
+    if low.endswith((".jpg", ".jpeg")):
+        fixed.convert("RGB").save(path, "JPEG", quality=90, optimize=True, progressive=True)
+    elif low.endswith(".png"):
+        fixed.save(path, "PNG", optimize=True)
+    else:
+        return False
+    return True
+
+def persist_placement(md_path, fm, body, entry):
+    """Write the resolved place and camera reading into the photo's frontmatter,
+    filling only blanks, so a later build no longer needs the (now stripped)
+    EXIF to keep the photo on the map. Returns True if it rewrote the file."""
+    changed = False
+    for key in ("lat", "lon", "bearing", "fov", "taken_at"):
+        val = entry.get(key)
+        if val not in (None, "") and fm.get(key) in (None, ""):
+            fm[key] = val
+            changed = True
+    if not changed:
+        return False
+    text = "---\n" + yaml.safe_dump(fm, sort_keys=False, allow_unicode=True).strip() + "\n---\n"
+    if body:
+        text += "\n" + body + "\n"
+    with open(md_path, "w", encoding="utf-8") as fh:
+        fh.write(text)
+    return True
+
 # ── Map settings (content/settings.yml → js/data/settings.js) ───────────────
 def build_settings():
     """Compile the editable map identity (title, subtitle, intro, about, credit)
@@ -276,6 +339,8 @@ def main():
     entries = []
     unplaced = []
     keep_narratives = set()
+    strip_exif = load_strip_exif()
+    stripped = 0
 
     for f in files:
         fm, body = parse_md(open(f, encoding="utf-8").read())
@@ -310,9 +375,15 @@ def main():
             print(f"  no location for {filename} "
                   f"(no GPS, and none placed or typed); left off the map for now.")
             unplaced.append({"file": filename, "caption": entry["caption"]})
+            if strip_exif and strip_image_exif(filename):
+                stripped += 1
             continue
         entries.append(entry)
         ensure_tiers(filename)
+        if strip_exif:
+            persist_placement(f, fm, body, entry)
+            if strip_image_exif(filename):
+                stripped += 1
 
         base = os.path.splitext(filename)[0]
         narr_path = os.path.join(NARR_DIR, base + ".md")
@@ -349,6 +420,11 @@ def main():
         verb = "needs" if len(unplaced) == 1 else "need"
         msg += f" ({len(unplaced)} still {verb} a location)"
     print(msg + ".")
+    if strip_exif and stripped:
+        print(f"  stripped EXIF/GPS from {stripped} published photograph(s); "
+              f"their place is kept in the frontmatter.")
+    elif not strip_exif:
+        print("  strip_exif is off: published photographs keep their EXIF/GPS.")
 
 
 if __name__ == "__main__":
