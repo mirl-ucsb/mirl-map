@@ -62,6 +62,7 @@ collections:
     fields:
       - { name: "image",    label: "Photograph", widget: "image" }
       - { name: "caption",  label: "Caption",    widget: "string", hint: "One or two sentences shown under the photo." }
+      - { name: "rights",   label: "Rights / credit", widget: "string", required: false, hint: "Optional. Who holds the rights or how to credit this photograph, e.g. CC BY 4.0, or Courtesy of the family." }
       - { name: "order",    label: "Order",      widget: "number", required: false, value_type: "int", hint: "Optional. A number to sequence the photo essay (1, 2, 3 ...). Photos without one keep their file order." }
       - { name: "body",     label: "Narrative",  widget: "markdown", required: false, hint: "Optional. Cite sources with tokens like [SAMP]." }
       - { name: "location", label: "Location (click to place)", widget: "map", type: "Point", decimals: 6, required: false, hint: "Click the map to place this photograph. Leave blank to use the photo's own GPS, or type coordinates below." }
