@@ -1510,8 +1510,7 @@ function runSearch() {
 // Wire up the input and clicks
 document.getElementById('search-input').addEventListener('input', runSearch);
 
-document.getElementById('search-results').addEventListener('click', function (e) {
-  var item = e.target.closest('.sr-item');
+function activateSearchResult(item) {
   if (!item) return;
   var idx = parseInt(item.getAttribute('data-result-idx'), 10);
   if (isNaN(idx)) return;
@@ -1519,6 +1518,16 @@ document.getElementById('search-results').addEventListener('click', function (e)
   // Pan to the photo (don't change zoom dramatically; keep current zoom but ensure ≥17)
   map.setView([p.lat, p.lon], Math.max(map.getZoom(), 17), { animate: !document.documentElement.classList.contains('rm') });
   openPhotoDrawer(idx);
+}
+document.getElementById('search-results').addEventListener('click', function (e) {
+  activateSearchResult(e.target.closest('.sr-item'));
+});
+document.getElementById('search-results').addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  var item = e.target.closest('.sr-item');
+  if (!item) return;
+  e.preventDefault();
+  activateSearchResult(item);
 });
 
 // Keyboard support inside the search input
