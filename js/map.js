@@ -597,18 +597,20 @@ function buildCitations(idx) {
   var today = _todayISO();
 
   var _place = CITE_PLACE ? (', ' + CITE_PLACE) : '';
+  var _rights = (p.rights || '').trim();
+  var _rightsNote = _rights ? ' ' + _rights + '.' : '';
 
   // Chicago — author-date / notes-bibliography blended for a photograph
   var chicago = CITE_AUTHOR + ', "' + caption + ',” photograph, ' + date.chicago +
-                _place + ', in ' + CITE_PROJECT + ', accessed ' + today + ', ' + url + '.';
+                _place + ', in ' + CITE_PROJECT + ', accessed ' + today + ', ' + url + '.' + _rightsNote;
 
   // MLA 9th edition
   var mla = CITE_AUTHOR_LASTF + '. "' + caption + '." Photograph, ' + date.full + _place + '. ' +
-            CITE_PROJECT + ', ' + url + '. Accessed ' + today + '.';
+            CITE_PROJECT + ', ' + url + '. Accessed ' + today + '.' + _rightsNote;
 
   // APA 7th
   var apa = CITE_AUTHOR_APA + ' (' + date.year + '). ' + captionShort +
-            ' [Photograph]. ' + CITE_PROJECT + '. ' + url;
+            ' [Photograph]. ' + CITE_PROJECT + '. ' + url + _rightsNote;
 
   // BibTeX
   var bibtex =
@@ -617,7 +619,7 @@ function buildCitations(idx) {
     '  title        = {' + captionShort.replace(/&/g, '\\&') + '},\n' +
     '  year         = {' + date.year + '},\n' +
     (date.month ? '  month        = ' + date.month + ',\n' : '') +
-    '  note         = {Photograph' + _place + '. File ' + fileId + '.},\n' +
+    '  note         = {Photograph' + _place + '. File ' + fileId + '.' + (_rights ? ' ' + _rights + '.' : '') + '},\n' +
     '  howpublished = {\\url{' + url + '}}\n' +
     '}';
 
@@ -745,7 +747,7 @@ function hideActiveHalo() {
 function openPhotoDrawer(idx){
   var p=photoInfo[idx];
   drawerIdx=idx;
-  document.getElementById('info-drawer-meta').innerHTML='<strong style="color:#5e6f82;font-size:.72rem;">'+p.file+'</strong><br><span style="font-family:monospace;">'+fmtCoords(p.lat,p.lon)+'</span>';
+  document.getElementById('info-drawer-meta').innerHTML='<strong style="color:#5e6f82;font-size:.72rem;">'+p.file+'</strong><br><span style="font-family:monospace;">'+fmtCoords(p.lat,p.lon)+'</span>'+(p.rights?'<br><span style="font-size:.72rem;color:#74859a;">'+escapeHtmlSafe(p.rights)+'</span>':'');
   var img=document.getElementById('info-drawer-img');
   img.src=CONFIG.images.web+photoInfo[idx].file; img.style.display='block';
   document.getElementById('info-drawer-caption').textContent=p.caption;

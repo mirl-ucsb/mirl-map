@@ -76,6 +76,7 @@
         var photoUrl  = PROJECT_URL + (CONFIG.images.full || 'photos/') + p.file;
         var caption   = p.caption || basename;
         var taken     = p.taken_at || '';
+        var rights    = p.rights || '';
         var bearing   = (typeof p.bearing === 'number') ? p.bearing : null;
 
         // Description: thumbnail + caption + permalink
@@ -84,6 +85,7 @@
         descParts.push('<p><img src="' + photoUrl + '" width="320" alt=""/></p>');
         descParts.push('<p><i>Taken ' + escapeXml(taken) + '</i>' +
           (bearing !== null ? ' &middot; bearing ' + Math.round(bearing) + '°' : '') + '</p>');
+        if (rights) descParts.push('<p>' + escapeXml(rights) + '</p>');
         descParts.push('<p><a href="' + permalink + '">View on the ' + escapeXml(CONFIG.site.title) + ' map</a></p>');
 
         lines.push('<Placemark>');
