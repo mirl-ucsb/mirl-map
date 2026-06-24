@@ -514,6 +514,7 @@ html.intro-skip #intro-screen { display: none !important; }
   font-size: 1rem; color: #1b2733; line-height: 1.6; font-style: italic;
   border-left: 3px solid #0f766e; padding-left: 12px;
 }
+.caption-2 { margin-top: 8px; font-style: normal; font-size: 0.92rem; color: #4a5763; }
 #info-drawer-context {
   font-size: 1rem; color: #1b2733; line-height: 1.78;
 }

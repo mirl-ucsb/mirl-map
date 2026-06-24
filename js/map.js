@@ -750,7 +750,9 @@ function openPhotoDrawer(idx){
   document.getElementById('info-drawer-meta').innerHTML='<strong style="color:#5e6f82;font-size:.72rem;">'+p.file+'</strong><br><span style="font-family:monospace;">'+fmtCoords(p.lat,p.lon)+'</span>'+(p.rights?'<br><span style="font-size:.72rem;color:#74859a;">'+escapeHtmlSafe(p.rights)+'</span>':'');
   var img=document.getElementById('info-drawer-img');
   img.src=CONFIG.images.web+photoInfo[idx].file; img.style.display='block';
-  document.getElementById('info-drawer-caption').textContent=p.caption;
+  var capEl=document.getElementById('info-drawer-caption');
+  capEl.textContent=p.caption;
+  if(p.caption_2){ var c2=document.createElement('div'); c2.className='caption-2'; c2.dir='auto'; c2.textContent=p.caption_2; capEl.appendChild(c2); }
   var ctxEl=document.getElementById('info-drawer-context');
   ctxEl.innerHTML='<p style="color:#74859a;font-style:italic;">Loading…</p>';
   loadNarrative(p.file).then(function(text){ ctxEl.innerHTML = renderNarrative(text) || '<p style="color:#74859a;font-style:italic;">No narrative yet.</p>'; });
@@ -833,7 +835,9 @@ var curIdx=0;
 function openLightbox(idx){
   curIdx=idx; var p=photoInfo[idx];
   document.getElementById('lightbox-img').src=CONFIG.images.full+photoInfo[idx].file;
-  document.getElementById('lightbox-caption-txt').textContent=p.caption;
+  var lbCap=document.getElementById('lightbox-caption-txt');
+  lbCap.textContent=p.caption;
+  if(p.caption_2){ var lc2=document.createElement('div'); lc2.className='caption-2'; lc2.dir='auto'; lc2.textContent=p.caption_2; lbCap.appendChild(lc2); }
   document.getElementById('lightbox-meta').textContent=p.file+'  \u00b7  '+fmtCoords(p.lat,p.lon)+'  \u00b7  '+(idx+1)+' of '+photoInfo.length;
   document.getElementById('lightbox').classList.add('open');
 }

@@ -62,6 +62,7 @@ collections:
     fields:
       - { name: "image",    label: "Photograph", widget: "image" }
       - { name: "caption",  label: "Caption",    widget: "string", hint: "One or two sentences shown under the photo." }
+      - { name: "caption_2", label: "Caption, second language", widget: "string", required: false, hint: "Optional. The same caption in another language, shown under the first. Right-to-left scripts are handled automatically." }
       - { name: "rights",   label: "Rights / credit", widget: "string", required: false, hint: "Optional. Who holds the rights or how to credit this photograph, e.g. CC BY 4.0, or Courtesy of the family." }
       - { name: "order",    label: "Order",      widget: "number", required: false, value_type: "int", hint: "Optional. A number to sequence the photo essay (1, 2, 3 ...). Photos without one keep their file order." }
       - { name: "body",     label: "Narrative",  widget: "markdown", required: false, hint: "Optional. Cite sources with tokens like [SAMP]." }

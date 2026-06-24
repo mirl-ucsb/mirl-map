@@ -145,6 +145,8 @@ def emit_photos_js(entries, unplaced=None):
             lines.append('    "fov": ' + json.dumps(e["fov"]))
         if e.get("taken_at"):
             lines.append('    "taken_at": ' + json.dumps(e["taken_at"]))
+        if e.get("caption_2"):
+            lines.append('    "caption_2": ' + json.dumps(e["caption_2"], ensure_ascii=False))
         if e.get("rights"):
             lines.append('    "rights": ' + json.dumps(e["rights"], ensure_ascii=False))
         blocks.append("  {\n" + ",\n".join(lines) + "\n  }")
@@ -296,6 +298,7 @@ def main():
             "lat": loc_lat if loc_lat is not None else pick("lat"),
             "lon": loc_lon if loc_lon is not None else pick("lon"),
             "caption": fm.get("caption") or "",
+            "caption_2": fm.get("caption_2") or "",
             "rights": fm.get("rights") or "",
             "source_ids": fm.get("sources") or [],
             "bearing": pick("bearing"),
