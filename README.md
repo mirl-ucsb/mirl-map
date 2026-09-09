@@ -2,7 +2,7 @@
 
 **Document a place through its photographs, and the writing that interprets them.**
 
-> **In active development.** This tool is being built and refined in the open. Its features, file formats, and interface may still change, and some parts may be incomplete or rough. Please keep your own copies of anything important, and reports of whatever breaks are welcome.
+> **In active development, not yet announced.** This tool is being built and refined in the open, and is not yet listed among the released MIRL Tools. Its features, file formats, and interface may still change, and some parts may be incomplete or rough. Please keep your own copies of anything important, and reports of whatever breaks are welcome.
 
 ![A MIRL Map: a satellite map of the UC Santa Barbara coast with photographs pinned along a bluff path, and a side panel showing one photograph with its caption, a narrative, and a citation.](docs/images/map.jpg)
 
