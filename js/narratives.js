@@ -117,6 +117,23 @@ function renderSourceList(text) {
     '</ul></div>';
 }
 
+/* The sources a narrative cites inline, which renderSourceList already lists
+   beneath it. A photograph's own source list (the drawer's Sources block, the
+   essay's list under each entry) leaves these out, so no source is listed twice. */
+function citedSourceIds(text) {
+  if (!text || typeof srcLib === 'undefined') return [];
+  var pattern = /\[([A-Z]{2,8})(?:\s+pp?\.\s*\d+(?:[–-]\d+)?)?\]/g;
+  var ids = [], m;
+  while ((m = pattern.exec(text)) !== null) {
+    if (srcLib[m[1]] && ids.indexOf(m[1]) < 0) ids.push(m[1]);
+  }
+  return ids;
+}
+function uncitedSourceIds(ids, text) {
+  var cited = citedSourceIds(text);
+  return (ids || []).filter(function (id) { return cited.indexOf(id) < 0; });
+}
+
 /* ── Citation tokens ─────────────────────────────────────
    Inline references in narrative Markdown use the syntax
    [ID] or [ID p.42] where ID matches a key in srcLib (see

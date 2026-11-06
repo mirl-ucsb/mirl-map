@@ -771,8 +771,13 @@ function openPhotoDrawer(idx){
   if(p.caption_2){ var c2=document.createElement('div'); c2.className='caption-2'; c2.dir='auto'; c2.textContent=p.caption_2; capEl.appendChild(c2); }
   var ctxEl=document.getElementById('info-drawer-context');
   ctxEl.innerHTML='<p class="drawer-note">Loading…</p>';
-  loadNarrative(p.file).then(function(text){ ctxEl.innerHTML = renderNarrative(text) || '<p class="drawer-note">No narrative yet.</p>'; });
-  document.getElementById('info-drawer-source').innerHTML=buildSrcHTML(p.source_ids);
+  var srcEl=document.getElementById('info-drawer-source');
+  srcEl.innerHTML='';
+  loadNarrative(p.file).then(function(text){
+    if (drawerIdx !== idx) return;   // the visitor has moved to another photograph
+    ctxEl.innerHTML = renderNarrative(text) || '<p class="drawer-note">No narrative yet.</p>';
+    srcEl.innerHTML = buildSrcHTML(uncitedSourceIds(p.source_ids, text));   // what the narrative has not already listed
+  });
   // Citation export button
   var citeEl = document.getElementById('info-drawer-cite');
   citeEl.innerHTML = '<button class="cite-button" type="button" onclick="openCiteModal(' + idx + ')">Cite this photograph</button>';

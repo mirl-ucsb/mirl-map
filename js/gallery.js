@@ -100,7 +100,7 @@ photoInfo.forEach(function(p, idx) {
     '<div class="g-caption">' + escapeHtml(p.caption || '') + '</div>' +
     (p.lat ? '<div class="g-coords">' + fmtCoords(p.lat, p.lon) + ' &nbsp;&middot;&nbsp; ' + p.file + '</div>' : '') +
     '<div class="g-context"></div>' +
-    buildSources(p.source_ids);
+    '<div class="g-src"></div>';
 
   grid.appendChild(entry);
 
@@ -108,6 +108,8 @@ photoInfo.forEach(function(p, idx) {
   loadNarrative(p.file).then(function(text) {
     var ctx = entry.querySelector('.g-context');
     ctx.innerHTML = renderNarrative(text);
+    // The entry's own sources, less those the narrative already lists
+    entry.querySelector('.g-src').innerHTML = buildSources(uncitedSourceIds(p.source_ids, text));
   });
 });
 
