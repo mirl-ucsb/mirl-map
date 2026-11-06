@@ -212,14 +212,18 @@ window.onLangChange = function () {
                { url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', subdomains:['a','b','c'], maxZoom:19 };
   var _sopts = { maxZoom: _sspec.maxZoom || 19 };
   if (_sspec.subdomains) _sopts.subdomains = _sspec.subdomains;
+  if (_sspec.tone)       _sopts.className  = 'tone-' + _sspec.tone;
   L.tileLayer(_sspec.url, _sopts).addTo(smap);
 
+  // Colours from the stylesheet's tokens (css/style.css), as on the map page.
+  var _css = getComputedStyle(document.documentElement);
+  function _tok(n, f){ var v = _css.getPropertyValue(n).trim(); return v || f; }
   var cone = L.polygon([], {
-    color: '#d97706', weight: 1, opacity: 0.85,
-    fillColor: '#f59e0b', fillOpacity: 0.30, interactive: false
+    color: _tok('--key-ink', '#0b6b62'), weight: 1, opacity: 0.85,
+    fillColor: _tok('--key', '#2ec4b6'), fillOpacity: 0.32, interactive: false
   }).addTo(smap);
   var dot = L.circleMarker(CONFIG.map.center, {
-    radius: 5, color: '#fff', weight: 2, fillColor: '#0f766e', fillOpacity: 1, interactive: false
+    radius: 5, color: _tok('--bg', '#fefaf0'), weight: 2, fillColor: _tok('--ink', '#1d1b18'), fillOpacity: 1, interactive: false
   }).addTo(smap);
 
   var panel  = document.getElementById('scrolly');

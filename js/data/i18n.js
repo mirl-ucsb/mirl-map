@@ -31,6 +31,7 @@ var siteI18N = {
   "nav.sources":     { en: "Sources" },
   "nav.compare":     { en: "Compare" },
   "nav.map":         { en: "Map" },
+  "nav.essay":       { en: "Essay" },
 
   /* Accessibility panel */
   "a11y.title":      { en: "Accessibility" },
@@ -49,7 +50,7 @@ var siteI18N = {
   "cmp.hint":        { en: "drag the handle &nbsp;&middot;&nbsp; pan/zoom shared" },
 
   /* Layers panel */
-  "lp.title":        { en: "Map Layers" },
+  "lp.title":        { en: "Map layers" },
   "lp.photos":       { en: "Photo markers" },
   "lp.landmarks":    { en: "Landmarks" },
   "lp.sightlines":   { en: "Sightlines (all photos)" },

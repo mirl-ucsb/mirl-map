@@ -52,7 +52,7 @@ const CONFIG = {
   map: {
     center:      [20, 0],                  // neutral fallback; the map auto-centers on your photos
     zoom:        2,
-    defaultBase: "satellite",              // id of the baseLayers entry shown first
+    defaultBase: "osm",                    // id of the baseLayers entry shown first (the paper street map)
     minZoom:     2
   },
 
@@ -68,10 +68,12 @@ const CONFIG = {
 
      Fields: id (unique), label (button text), url, attribution (required,
      credit the source), maxZoom. Optional: subdomains:["a","b","c"] when the
-     url has {s}; langVariants for localized tiles (see the commented example). */
+     url has {s}; langVariants for localized tiles (see the commented example);
+     tone:"paper" to drain a street map of colour and warm it toward the page
+     (the look is set by .tone-paper in css/style.css). */
   baseLayers: [
     {
-      id: "osm", label: "Map",
+      id: "osm", label: "Streets", tone: "paper",
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       subdomains: ["a", "b", "c"],
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',

@@ -4,7 +4,7 @@
 
 > **In active development, not yet announced.** This tool is being built and refined in the open, and is not yet listed among the released MIRL Tools. Its features, file formats, and interface may still change, and some parts may be incomplete or rough. Please keep your own copies of anything important, and reports of whatever breaks are welcome.
 
-![A MIRL Map: a satellite map of the UC Santa Barbara coast with photographs pinned along a bluff path, and a side panel showing one photograph with its caption, a narrative, and a citation.](docs/images/map.jpg)
+![A MIRL Map: a paper-toned street map of the UC Santa Barbara coast with photographs pinned along a bluff path, one of them showing the direction its camera faced, and a side panel with that photograph, its caption, a narrative, and its sources.](docs/images/map.jpg)
 
 MIRL Map turns a body of photographs into two readings of the same material: an
 **interactive map**, where each image rests at the place it was made, and a
@@ -75,7 +75,7 @@ Each map has a **dashboard**, its home for editing. From there you add
 photographs, write, and shape how the map reads, all through simple forms. There
 are no files to touch and nothing to install.
 
-![The editing dashboard: the map's title, a count of photographs, and buttons to add a photograph, manage photographs, edit map details, and view the live map, with a live preview below.](docs/images/dashboard.png)
+![The editing dashboard: the map's title, a count of photographs, and buttons to add a photograph, manage photographs, edit map details, and read the map as an essay, with a live preview below.](docs/images/dashboard.png)
 
 - **Add a photograph.** Drag in an image, write a caption, and add a narrative if
   you like. **Its location is read from the photograph itself**, since most
@@ -148,6 +148,12 @@ village of Lifta and was generalized so that any researcher, teacher, or communi
 could use the same method. The map is drawn with OpenStreetMap and Esri imagery,
 and the code is openly commented for anyone who wants to look under the hood.
 
+It shares the visual identity of the other MIRL tools: paper and ink, with one of
+the four colours of the MIRL mark as its key (for the map, teal). Its typefaces
+are Familjen Grotesk, Epilogue, IBM Plex Mono, and Noto Naskh Arabic, and they
+are stored with the map itself, so a visitor's browser never fetches a font from
+an outside service.
+
 ---
 
 ## License
@@ -161,4 +167,6 @@ your writing stay entirely yours. The photographs in the live example are by Jef
 O'Brien and are shown by permission.
 
 MIRL Map bundles one third-party component, leaflet-side-by-side (MIT), by Digital
-Democracy.
+Democracy, and four typefaces under the SIL Open Font License: Familjen Grotesk,
+Epilogue, IBM Plex Mono, and Noto Naskh Arabic. Their license texts are in
+[fonts/](fonts/).
